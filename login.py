@@ -1,14 +1,14 @@
 import asyncio, re
 from pyppeteer.launcher import launch
 from pyppeteer.errors import TimeoutError
-from settings import launch_setting, login_url, width, height, launch_setting_dev
+from settings import launch_setting, login_url, width, height
 from smtp import mail_pic
 
 
 class Login(object):
 
     def __init__(self):
-        self.browser = asyncio.get_event_loop().run_until_complete(launch(launch_setting_dev))
+        self.browser = asyncio.get_event_loop().run_until_complete(launch(launch_setting))
         self.page = asyncio.get_event_loop().run_until_complete(self.browser.newPage())
 
     async def login(self):
