@@ -23,12 +23,12 @@ def to_weberp():
     # print(df1)
     df2 = pd.read_sql(sql2, con_spider)
     # print(df2)
-    con_spider.close()
+
     df1["importDate"] = time_now()
     df2["importDate"] = time_now()
     df3 = df1.drop("id", axis=1)
     df4 = df2.drop("id", axis=1)
-    print(df3)
+
     con_weberp = create_engine("mysql+pymysql://root:root@localhost/weberp", encoding="utf-8")
     # try:
     df3.to_sql("tb_order_spider", con_weberp, if_exists="append", index=False)
@@ -37,6 +37,13 @@ def to_weberp():
     df4.to_csv("./tb_order_detail_spider.csv")
     # except Exception:
     #     pass
+    order_list = df3['orderNo'].to_list()
+    for i in order_list:
+        sql = "update tb_order_spider set isVerify = '2' where orderNo = '%s'" % (i)
+        cursor = con_spider.cursor()
+        cursor.execute(sql)
+        con_spider.commit()
+    con_spider.close()
 
 
 if __name__ == '__main__':
