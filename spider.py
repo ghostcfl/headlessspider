@@ -107,7 +107,7 @@ class Spider():
                 item['orderNo'] = mainOrders[i]["id"]
                 item['itemNo'] = str(j)
                 item['goodsCode'] = items[j]['itemInfo']['extra'][0]['value']
-                item['tbName'] = items[j]['itemInfo']['title']
+                item['tbName'] = re.sub("(\s+)", " ", items[j]['itemInfo']['title']).strip()
                 item['unitPrice'] = items[j]['priceInfo']['realTotal']
                 item['sellNum'] = items[j]['quantity']
                 item['orderStatus'] = order['orderStatus']
@@ -162,7 +162,8 @@ class Spider():
                         item1 = {}
                         item2 = {}
                         item1["refundStatus"] = item.find("td.status").text().strip()
-                        item2["tbName"] = item.find("td.item-desc").text().strip().replace("&plusmn;", "±")
+                        tbName = item.find("td.item-desc").text().strip().replace("&plusmn;", "±")
+                        item2["tbName"] = re.sub("(\s+)", " ", tbName).strip()
                         item2["orderNo"] = orderNo
                         self.update_new(TABLENAME="tb_order_detail_spider", SET=item1, WHERE=item2)
                         logger.warning(
@@ -200,7 +201,8 @@ class Spider():
                     item2 = {}
                     benefits = i.find(".promotion-mod__promotion___q71TJ").text()
                     if benefits:
-                        item2["tbName"] = i.find(".desc .name a").text().strip().replace("&plusmn;", "±")
+                        tbName = i.find(".desc .name a").text().strip().replace("&plusmn;", "±")
+                        item2["tbName"] = re.sub("(\s+)", " ", tbName).strip()
                         item2["orderNo"] = orderNo
                         unitBenefits = i.find(".promotion-mod__promotion___q71TJ").text()
                         item1["unitBenefits"] = str(
@@ -298,7 +300,7 @@ class Spider():
         """查询数据库tb_order_spider表中，没有被爬取过订单详情的数据"""
         sql = "select datailURL from tb_order_spider where isDetaildown = 0 and fromStore = '%s'" % (self.fromStore)
         # print(sql)
-        # sql = "SELECT datailURL FROM tb_order_spider WHERE orderNo = '532424097673835255'"
+        # sql = "SELECT datailURL FROM tb_order_spider WHERE orderNo = '531852160106225329'"
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         return result
