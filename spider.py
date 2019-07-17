@@ -1,4 +1,4 @@
-import asyncio, logging, random, pymysql, datetime, re
+import asyncio, logging, random, pymysql, datetime, re, time
 import numpy as np
 from pyquery.pyquery import PyQuery as pq
 from login import Login
@@ -297,8 +297,8 @@ class Spider():
     def select_ndd(self, orderNo=None):
         """查询数据库tb_order_spider表中，没有被爬取过订单详情的数据"""
         sql = "select datailURL from tb_order_spider where isDetaildown = 0 and fromStore = '%s'" % (self.fromStore)
-        print(sql)
-        # sql = "SELECT datailURL FROM tb_order_spider WHERE orderNo = '511545954477732917'"
+        # print(sql)
+        # sql = "SELECT datailURL FROM tb_order_spider WHERE orderNo = '532424097673835255'"
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         return result
@@ -354,4 +354,4 @@ if __name__ == '__main__':
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
-        asyncio.sleep(900)
+        time.sleep(900)

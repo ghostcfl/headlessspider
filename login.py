@@ -8,7 +8,7 @@ from smtp import mail_pic
 class Login(object):
 
     def __init__(self):
-        self.browser = asyncio.get_event_loop().run_until_complete(launch(launch_setting))
+        self.browser = asyncio.get_event_loop().run_until_complete(launch(launch_setting_dev))
         self.page = asyncio.get_event_loop().run_until_complete(self.browser.newPage())
 
     async def login(self):

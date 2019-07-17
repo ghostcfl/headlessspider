@@ -58,3 +58,18 @@ if __name__ == '__main__':
     # string = "当前订单状态：商家已发货，等待买家确认"
     # string = "当前订单状态：交易成功"
     print(status_format(string))
+
+
+def store_trans(string):
+    if string == "YK":
+        return '玉佳企业店'
+    elif string == "KY":
+        return "开源电子"
+    elif string == "SC":
+        return '微信商城'
+    elif string == "VP":
+        return '批发'
+    elif string == "YJ":
+        return "玉佳电子"
+    elif string == "TB":
+        return "赛宝电子"

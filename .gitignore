@@ -1,5 +1,5 @@
 /chrome-win
-settings
+settings.py
 test.py
 /.idea
 /__pycache__
