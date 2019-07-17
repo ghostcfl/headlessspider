@@ -11,7 +11,7 @@ def Verify():
     cursor = con.cursor()
 
     # sql1 = "SELECT orderNo,unitPrice,sellNum,unitBenefits FROM tb_order_detail_spider"
-    sql1 = "SELECT orderNo,deliverFee,actualFee,couponPrice,fromStore FROM tb_order_spider where isDetaildown = 1"
+    sql1 = "SELECT orderNo,deliverFee,actualFee,couponPrice,fromStore FROM tb_order_spider where isDetaildown = '1'"
     # sql2 = "SELECT orderNo,deliverPrice,totalPrice FROM tb_order_spider where orderNo='%s'" % orderNo
     cursor.execute(sql1)
     result = cursor.fetchall()
@@ -41,6 +41,9 @@ def Verify():
             list_tmp.append(store_trans(fromStore))
             list_tmp.append(orderNo)
             l_orderNo.append("|".join(list_tmp))
+            sql4 = "update tb_order_spider set isDetaildown = '1' where orderNo = '%s'" % (orderNo)
+            cursor.execute(sql4)
+            con.commit()
         else:
             sql3 = "update tb_order_spider set isVerify='1' where orderNo = '%s'"%(orderNo)
             cursor.execute(sql3)
