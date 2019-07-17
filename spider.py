@@ -31,11 +31,12 @@ class Spider():
 
     def __init__(self):
         self.login = Login()
-        self.browser, self.page, self.fromStore = asyncio.get_event_loop().run_until_complete(self.login.login())
+        loop = asyncio.get_event_loop()
+        self.browser, self.page, self.fromStore = loop.run_until_complete(self.login.login())
 
     def connect_sql(self):
-        # self.con = pymysql.connect(**SQL_SETTINGS)
-        self.con = pymysql.connect(**LOCAL_SQL_SETTINGS)
+        self.con = pymysql.connect(**SQL_SETTINGS)
+        # self.con = pymysql.connect(**LOCAL_SQL_SETTINGS)
         self.cursor = self.con.cursor()
 
     def sql_close(self):
@@ -146,7 +147,7 @@ class Spider():
             # order = {}
             for url in result:
                 order = {}
-                page = self.page
+                page = await self.browser.newPage()
                 # await self.login.page_evaluate(page)
                 await page.goto(url[0])
                 await page.waitForSelector("title")
@@ -210,10 +211,15 @@ class Spider():
                                 "unitBenefits"])
                 self.update_new(TABLENAME="tb_order_spider", SET=order, WHERE={"orderNo": orderNo})
                 logger.warning(orderNo + "更新详情入库成功")
-                ss = random.randint(10, 30)
-                print(str(ss) + "秒后开始爬取下一条")
-                await asyncio.sleep(ss)
-                # await page.close()
+                await asyncio.sleep(5)
+                await page.close()
+                while True:
+                    ss = random.random()
+                    if ss > 0.3:
+                        print(str(ss * 60) + "秒后开始爬取下一条")
+                        await asyncio.sleep(ss * 60)
+                        break
+
         else:
             print("没有可爬的详情")
 
@@ -333,13 +339,19 @@ class Spider():
 
 if __name__ == '__main__':
     spider = Spider()
-    print(spider.fromStore)
-    print("starting spider")
-    start_time = datetime.datetime.now()
-    spider.connect_sql()
-    asyncio.get_event_loop().run_until_complete(spider.get_page())
-    asyncio.get_event_loop().run_until_complete(spider.order_page())
-    spider.sql_close()
-    end_time = datetime.datetime.now()
-    spending_time = end_time - start_time
-    print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+    while True:
+        print(spider.fromStore)
+        print("starting spider")
+        start_time = datetime.datetime.now()
+        spider.connect_sql()
+        loop = asyncio.get_event_loop()
+        tasks = [spider.get_page(), spider.order_page()]
+        loop.run_until_complete(asyncio.wait(tasks))
+        # loop.run_until_complete(spider.get_page())
+        # loop.run_until_complete(spider.order_page())
+        loop.close()
+        spider.sql_close()
+        end_time = datetime.datetime.now()
+        spending_time = end_time - start_time
+        print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+        asyncio.sleep(900)

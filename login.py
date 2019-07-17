@@ -4,6 +4,7 @@ from pyppeteer.errors import TimeoutError
 from settings import launch_setting, login_url, width, height, launch_setting_dev
 from smtp import mail_pic
 
+
 class Login(object):
 
     def __init__(self):
@@ -22,8 +23,9 @@ class Login(object):
         finally:
             image_element = await self.page.querySelector("#J_QRCodeImg")
             await image_element.screenshot({'path': './qrcode.png'})
-            email = input("输入接收登陆二维码的邮箱")
-            mail_pic(email.split(","))
+            print("扫码登陆")
+            # email = input("输入接收登陆二维码的邮箱")
+            # mail_pic(email.split(","))
         await self.page.waitForSelector("#container", timeout=0)
         content = await self.page.content()
         account = re.search('nick: "(.*?)",', content).group(1)
