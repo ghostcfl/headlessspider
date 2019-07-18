@@ -14,9 +14,7 @@ class Sql():
         self.con.close()
 
     def insert_new_data(self, table_name, **kwargs):
-        keys = ','.join(kwargs.keys())
-        values = ','.join(['%s'] * len(kwargs))
-        sql = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, keys, values)
+        sql = self.insert_new_data_sql(table_name, **kwargs)
         try:
             self.cursor.execute(sql, tuple(kwargs.values()))
         except Exception as e:
@@ -25,9 +23,7 @@ class Sql():
             self.con.commit()
 
     def update_old_data(self, table_name, dict1, dict2):
-        set = self.concat(dict1, ",")
-        where = self.concat(dict2, " AND ")
-        sql = "UPDATE %s SET %s WHERE %s" % (table_name, set, where)
+        sql = self.update_old_data_sql(table_name, dict1, dict2)
         try:
             self.cursor.execute(sql)
         except Exception as e:
@@ -36,32 +32,13 @@ class Sql():
             self.con.commit()
 
     def select_data(self, table_name, limit_num, *args, **kwargs):
-        """
-        :param table_name: 操作的表名
-        :param limit_num:查询结果输出的条数
-        :param args: 需要查询的表头数组
-        :param kwargs: 查询条件的字典
-        :return: 查询结果
-        """
-        table_head = ",".join(args)
-        if kwargs:
-            a = self.concat(kwargs, " AND ")
-            where = " where %s" % (a)
-        else:
-            where = ""
-        if limit_num != 0:
-            limit = " limit %d" % (limit_num)
-        else:
-            limit = ""
-        sql = "select %s from %s%s%s" % (table_head, table_name, where, limit)
+        sql = self.select_data_sql(table_name, limit_num, *args, **kwargs)
         self.cursor.execute(sql)
         res = self.cursor.fetchall()
         return res
 
     def delete_data(self, table_name, **kwargs):
-        where = self.concat(kwargs, ' AND ')
-        sql = "delete from %s where %s" % (table_name, where)
-        print(sql)
+        sql = self.delete_data_sql(table_name, **kwargs)
         try:
             self.cursor.execute(sql)
         except Exception as e:
@@ -84,8 +61,46 @@ class Sql():
         conditions = string.join(list_key_value)
         return conditions
 
+    def insert_new_data_sql(self, table_name, **kwargs):
+        keys = ','.join(kwargs.keys())
+        values = ','.join(['%s'] * len(kwargs))
+        sql = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, keys, values)
+        return sql
+
+    def select_data_sql(self, table_name, limit_num, *args, **kwargs):
+        """
+        :param table_name: 操作的表名
+        :param limit_num:查询结果输出的条数
+        :param args: 需要查询的表头数组
+        :param kwargs: 查询条件的字典
+        :return: 查询结果
+        """
+        table_head = ",".join(args)
+        if kwargs:
+            a = self.concat(kwargs, " AND ")
+            where_string = " where %s" % (a)
+        else:
+            where_string = ""
+        if limit_num != 0:
+            limit = " limit %d" % limit_num
+        else:
+            limit = ""
+        sql = "select %s from %s%s%s" % (table_head, table_name, where_string, limit)
+        return sql
+
+    def update_old_data_sql(self, table_name, dict1, dict2):
+        set_string = self.concat(dict1, ",")
+        where_string = self.concat(dict2, " AND ")
+        sql = "UPDATE %s SET %s WHERE %s" % (table_name, set_string, where_string)
+        return sql
+
+    def delete_data_sql(self, table_name, **kwargs):
+        where_string = self.concat(kwargs, ' AND ')
+        sql = "delete from %s where %s" % (table_name, where_string)
+        return sql
+
 
 if __name__ == '__main__':
     LOCAL_SQL_SETTINGS['db'] = "weberp"
-    sql = Sql(**LOCAL_SQL_SETTINGS)
-    sql.delete_data('table', fromStore="YK", orderNO=datetime.datetime.now())
+    sql_element = Sql(**LOCAL_SQL_SETTINGS)
+    sql_element.delete_data('table', fromStore="YK", orderNO=datetime.datetime.now())

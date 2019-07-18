@@ -1,20 +1,15 @@
-import pymysql
 from settings import SQL_SETTINGS
 from smtp import mail
 from Format import store_trans
+from sql import Sql
 
 
 def Verify():
     l_orderNo = []
-    con = pymysql.connect(**SQL_SETTINGS)
-    # self.con = pymysql.connect(host='localhost', port=3306, user='root', password='', db='test')
-    cursor = con.cursor()
-
-    # sql1 = "SELECT orderNo,unitPrice,sellNum,unitBenefits FROM tb_order_detail_spider"
-    sql1 = "SELECT orderNo,deliverFee,actualFee,couponPrice,fromStore FROM tb_order_spider where isDetaildown = '1'"
-    # sql2 = "SELECT orderNo,deliverPrice,totalPrice FROM tb_order_spider where orderNo='%s'" % orderNo
-    cursor.execute(sql1)
-    result = cursor.fetchall()
+    sql_element = Sql(**SQL_SETTINGS)
+    args = ['orderNo', 'deliverFee', 'actualFee', 'couponPrice', 'fromStore']
+    kwargs = {'isVerify': '0', 'isDetaildown': '1'}
+    result = sql_element.select_data("tb_order_spider", 0, *args, **kwargs)
     for i in result:
         total = 0
         orderNo = i[0]
@@ -22,9 +17,9 @@ def Verify():
         actualFee = i[2]
         couponPrice = i[3]
         fromStore = i[4]
-        sql2 = "SELECT unitPrice,sellNum,unitBenefits FROM tb_order_detail_spider where orderNo='%s'" % orderNo
-        cursor.execute(sql2)
-        result2 = cursor.fetchall()
+        args = ['unitPrice', 'sellNum', 'unitBenefits']
+        kwargs = {'orderNo': orderNo}
+        result2 = sql_element.select_data('tb_order_detail_spider', 0, *args, **kwargs)
         for j in result2:
             unitPrice = j[0]
             sellNum = j[1]
@@ -42,9 +37,9 @@ def Verify():
             list_tmp.append(orderNo)
             l_orderNo.append("|".join(list_tmp))
         else:
-            sql3 = "update tb_order_spider set isVerify='1' where orderNo = '%s'"%(orderNo)
-            cursor.execute(sql3)
-            con.commit()
+            dict1 = {'isVerify': '1'}
+            dict2 = {'orderNo': orderNo}
+            sql_element.update_old_data('tb_order_spider', dict1, dict2)
             # print('没有异常数据，验证完成！')
     if l_orderNo:
         s = "\n".join(l_orderNo)
