@@ -103,4 +103,9 @@ class Sql():
 if __name__ == '__main__':
     LOCAL_SQL_SETTINGS['db'] = "weberp"
     sql_element = Sql(**LOCAL_SQL_SETTINGS)
-    sql_element.delete_data('table', fromStore="YK", orderNO=datetime.datetime.now())
+    res = sql_element.select_data('tb_order_spider', 0, "*", fromStore="YK")
+    print(res)
+    if res:
+        print("a")
+    else:
+        print("b")

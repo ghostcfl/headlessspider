@@ -10,6 +10,7 @@ class MaintainPrice():
         self.item = kwargs
         self.item['operator'] = "爬虫维护"
         self.item['last_time'] = time_now()
+        self.item['currabrev'] = "CNY"
 
     def shop_id(self):
         res = self.sql_element.select_data('salestypes', 0, 'shop_id', typeabbrev=self.item['fromStore'])
@@ -20,14 +21,15 @@ class MaintainPrice():
                   'description': self.item['tbName'],
                   'shop_id': self.item['shop_id'],
                   }
-        res = self.sql_element.select_data_sql('prices_tb', 0, 'price_tb', **kwargs)
-        print(res)
-        # if res is None:
-        #     return "创建"
-        # elif self.item['unitPrice'] != res[0][0]:
-        #     return "更新"
-        # else:
-        #     return None
+        res = self.sql_element.select_data('prices_tb', 0, 'price_tb', **kwargs)
+        if res:
+            pass
+            if self.item['unitPrice'] != res[0][0]:
+                return "更新"
+            else:
+                return None
+        else:
+            return "创建"
 
     def maintain(self):
         self.shop_id()
