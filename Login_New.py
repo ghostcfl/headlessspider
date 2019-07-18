@@ -4,7 +4,7 @@ import random
 from pyppeteer.launcher import launch  # 控制模拟浏览器用
 from retrying import retry  # 设置重试次数用的
 from pyppeteer import errors
-from settings.spider_settings import STORE_INFO
+from settings import STORE_INFO
 
 width, height = 1600, 900
 login_url = "https://login.taobao.com/"
