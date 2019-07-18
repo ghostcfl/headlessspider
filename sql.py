@@ -88,4 +88,4 @@ class Sql():
 if __name__ == '__main__':
     LOCAL_SQL_SETTINGS['db'] = "weberp"
     sql = Sql(**LOCAL_SQL_SETTINGS)
-    a = sql.delete_data('table',fromStore="YK", orderNO=datetime.datetime.now())
+    sql.delete_data('table', fromStore="YK", orderNO=datetime.datetime.now())
