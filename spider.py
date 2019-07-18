@@ -340,20 +340,19 @@ class Spider():
 
 
 if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
     spider = Spider()
     while True:
         print(spider.fromStore)
         print("starting spider")
         start_time = datetime.datetime.now()
         spider.connect_sql()
-        loop = asyncio.get_event_loop()
         tasks = [spider.get_page(), spider.order_page()]
         loop.run_until_complete(asyncio.wait(tasks))
         # loop.run_until_complete(spider.get_page())
         # loop.run_until_complete(spider.order_page())
-        loop.close()
-        spider.sql_close()
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
-        time.sleep(900)
+        spider.sql_close()
+        loop.run_until_complete(asyncio.sleep(900))
