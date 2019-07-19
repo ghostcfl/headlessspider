@@ -1,6 +1,5 @@
 import pymysql
-from settings import LOCAL_SQL_SETTINGS
-import datetime
+from settings import SQL_SETTINGS_ERP
 
 
 class Sql():
@@ -101,8 +100,8 @@ class Sql():
 
 
 if __name__ == '__main__':
-    LOCAL_SQL_SETTINGS['db'] = "weberp"
-    sql_element = Sql(**LOCAL_SQL_SETTINGS)
+    SQL_SETTINGS_ERP['db'] = "weberp"
+    sql_element = Sql(**SQL_SETTINGS_ERP)
     res = sql_element.select_data('tb_order_spider', 0, "*", fromStore="YK")
     print(res)
     if res:
