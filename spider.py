@@ -2,7 +2,7 @@ import asyncio, logging, random, pymysql, datetime, re, time
 import numpy as np
 from pyquery.pyquery import PyQuery as pq
 from login import Login
-from settings import SQL_SETTINGS, LOCAL_SQL_SETTINGS
+from settings import SQL_SETTINGS_SPIDER
 from Format import time_now, status_format
 from smtp import mail
 
@@ -35,8 +35,7 @@ class Spider():
         self.browser, self.page, self.fromStore = loop.run_until_complete(self.login.login())
 
     def connect_sql(self):
-        self.con = pymysql.connect(**SQL_SETTINGS)
-        # self.con = pymysql.connect(**LOCAL_SQL_SETTINGS)
+        self.con = pymysql.connect(**SQL_SETTINGS_SPIDER)
         self.cursor = self.con.cursor()
 
     def sql_close(self):
