@@ -1,10 +1,10 @@
-from settings import WEBERP_SQL_SETTINGS
+from settings import SQL_SETTINGS_ERP
 from Format import time_now
 from sql import Sql
 
 
 class MaintainPrice():
-    sql_element = Sql(**WEBERP_SQL_SETTINGS)
+    sql_element = Sql(**SQL_SETTINGS_ERP)
 
     def __init__(self, **kwargs):
         self.item = kwargs
