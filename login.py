@@ -60,7 +60,7 @@ class Login(object):
         #     '''() =>{ Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5,6], }); }''')
 
     async def phone_verify(self):
-        await self.page.goto("https://trade.taobao.com/trade/itemlist/list_sold_items.htm")
+        await self.page.goto("https://trade.taobao.com/trade/itemlist/list_sold_items.htm",timeout=0)
         try:
             await self.page.waitForSelector("div.aq_overlay_mask", timeout=10000)
         except TimeoutError:

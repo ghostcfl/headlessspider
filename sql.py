@@ -4,12 +4,12 @@ from settings import SQL_SETTINGS_ERP
 
 class Sql():
     def __init__(self, **kwargs):
-        print("数据库连接")
+        # print("数据库连接")
         self.con = pymysql.connect(**kwargs)
         self.cursor = self.con.cursor()
 
     def __del__(self):
-        print("关闭数据库")
+        # print("关闭数据库")
         self.con.close()
 
     def insert_new_data(self, table_name, **kwargs):

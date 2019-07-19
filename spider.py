@@ -5,6 +5,7 @@ from login import Login
 from settings import SQL_SETTINGS_SPIDER
 from Format import time_now, status_format
 from smtp import mail
+from maintain_price import MaintainPrice
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.WARNING)
@@ -28,6 +29,7 @@ class Spider():
     page = None
     fromStore = None
     browser = None
+    m = MaintainPrice()
 
     def __init__(self):
         self.login = Login()
@@ -110,6 +112,18 @@ class Spider():
                 item['unitPrice'] = items[j]['priceInfo']['realTotal']
                 item['sellNum'] = items[j]['quantity']
                 item['orderStatus'] = order['orderStatus']
+                url = "https:" + items[j]['itemInfo']['itemUrl']
+                if self.m.data_compare(goodsCode=item["goodsCode"],
+                                       tbName=item['tbName'],
+                                       fromStore=self.fromStore):
+                    page_temp = await self.browser.newPage()
+                    await self.login.page_evaluate(page_temp)
+                    await page_temp.goto(url)
+                    content = await page_temp.content()
+                    await asyncio.sleep(5)
+                    await page_temp.close()
+                    temp = re.search('<span class="value-inline">(\d+)</span>', content)
+                    print(temp.group(1))
                 try:
                     goodsAttributes = items[j]['itemInfo']['skuText']
                 except KeyError:
