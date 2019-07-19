@@ -1,13 +1,13 @@
 import datetime, pymysql
 import re
-from settings import SQL_SETTINGS
+from settings import SQL_SETTINGS_SPIDER
 from smtp import mail
 from Format import time_zone
 
 
 def orderMonitor():
     item = {}
-    con = pymysql.connect(**SQL_SETTINGS)
+    con = pymysql.connect(**SQL_SETTINGS_SPIDER)
     cursor = con.cursor()
     result = select_order(cursor, con)
     for i in result:
