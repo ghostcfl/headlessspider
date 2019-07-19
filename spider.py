@@ -75,11 +75,11 @@ class Spider():
             await page.waitForSelector(".pagination-item-" + str(i) + " a", timeout=0)
             print("正面爬取第" + str(i) + "页" + time_now())
             await page.click(".pagination-item-" + str(i) + " a")
-            while True:
-                s = random.random()
-                if s > 0.3:
-                    await asyncio.sleep(s * 30)
-                    break
+            # while True:
+            #     s = random.random()
+            #     if s > 0.3:
+            #         await asyncio.sleep(s * 30)
+            #         break
 
     async def parse(self, mainOrders):
         """解析爬取内容信息"""
@@ -113,17 +113,6 @@ class Spider():
                 item['sellNum'] = items[j]['quantity']
                 item['orderStatus'] = order['orderStatus']
                 url = "https:" + items[j]['itemInfo']['itemUrl']
-                if self.m.data_compare(goodsCode=item["goodsCode"],
-                                       tbName=item['tbName'],
-                                       fromStore=self.fromStore):
-                    page_temp = await self.browser.newPage()
-                    await self.login.page_evaluate(page_temp)
-                    await page_temp.goto(url)
-                    content = await page_temp.content()
-                    await asyncio.sleep(5)
-                    await page_temp.close()
-                    temp = re.search('<span class="value-inline">(\d+)</span>', content)
-                    print(temp.group(1))
                 try:
                     goodsAttributes = items[j]['itemInfo']['skuText']
                 except KeyError:
@@ -141,6 +130,17 @@ class Spider():
                     for x in range(len(refund)):
                         item['refundStatus'] = refund[x]['text']
                         item['isRefund'] = "1"
+                if self.m.data_compare(goodsCode=item["goodsCode"],
+                                       tbName=item['tbName'],
+                                       fromStore=self.fromStore):
+                    page_temp = await self.browser.newPage()
+                    await self.login.page_evaluate(page_temp)
+                    await page_temp.goto(url)
+                    content = await page_temp.content()
+                    await asyncio.sleep(5)
+                    await page_temp.close()
+                    temp = re.search('<span class="value-inline">(\d+)</span>', content)
+                    print(temp.group(1))
                 self.save_in_sql(item=item, tableName='tb_order_detail_spider')
             self.save_in_sql(item=order, tableName='tb_order_spider')
 
