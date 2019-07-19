@@ -1,8 +1,9 @@
 import pandas as pd
 import pymysql
-from settings import SQL_SETTINGS
+from settings import SQL_SETTINGS_SPIDER
 from sqlalchemy import create_engine
 from Format import time_now
+from settings import ERP_SQL_ENGINE
 
 
 def to_weberp():
@@ -15,7 +16,7 @@ def to_weberp():
     index: DataFrame的index列是否要插入，默认True
     :return:
     """
-    con_spider = pymysql.connect(**SQL_SETTINGS)
+    con_spider = pymysql.connect(**SQL_SETTINGS_SPIDER)
     sql1 = "SELECT * FROM tb_order_spider WHERE isVerify = '1'"
     sql2 = """SELECT p.* FROM tb_order_detail_spider AS p,tb_order_spider AS l
            WHERE p.`orderNo` = l.`orderNo` AND l.`isVerify` = '1' """
@@ -29,7 +30,7 @@ def to_weberp():
     df3 = df1.drop("id", axis=1)
     df4 = df2.drop("id", axis=1)
 
-    con_weberp = create_engine("mysql+pymysql://root:root@localhost/weberp", encoding="utf-8")
+    con_weberp = create_engine(ERP_SQL_ENGINE, encoding="utf-8")
     # try:
     df3.to_sql("tb_order_spider", con_weberp, if_exists="append", index=False)
     df4.to_sql("tb_order_detail_spider", con_weberp, if_exists="append", index=False)
