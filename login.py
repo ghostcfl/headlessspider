@@ -1,4 +1,4 @@
-import asyncio, re
+import asyncio, re, random
 from pyppeteer.launcher import launch
 from pyppeteer.errors import TimeoutError
 from settings import launch_setting, login_url, width, height
@@ -36,6 +36,7 @@ class Login(object):
         elif account == "玉佳电子科技有限公司:test":
             print("玉佳企业店登陆成功")
             fromStore = "YK"
+        await self.phone_verify()
         return self.browser, self.page, fromStore
 
     async def get_cookies(self):
@@ -57,6 +58,24 @@ class Login(object):
         #     '''() =>{ Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] }); }''')
         # await self.page.evaluate(
         #     '''() =>{ Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5,6], }); }''')
+
+    async def phone_verify(self):
+        await self.page.goto("https://trade.taobao.com/trade/itemlist/list_sold_items.htm")
+        try:
+            await self.page.waitForSelector("div.aq_overlay_mask", timeout=10000)
+        except TimeoutError:
+            pass
+        else:
+            print("需要要手机验证码")
+            await asyncio.sleep(10)
+            frames = self.page.frames
+            await frames[1].click(".J_SendCodeBtn")
+            a = input("请输入6位数字验证码：")
+            await frames[1].type(".J_SafeCode", a, {'delay': self.input_time_random() - 50})
+            await frames[1].click("#J_FooterSubmitBtn")
+
+    def input_time_random(self):
+        return random.randint(100, 151)
 
 
 if __name__ == '__main__':
