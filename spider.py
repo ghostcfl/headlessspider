@@ -46,7 +46,7 @@ class Spider():
     async def get_page(self):
         # 跳转至订单页面
         await self.page.goto(self.url)  # 跳转到订单页面
-        await self.next_page(self.page, 1)
+        await self.next_page(self.page)
 
     async def intercept_request(self, req):
         """截取request请求"""
@@ -62,7 +62,7 @@ class Spider():
             a = await res.json()
             await self.parse(a['mainOrders'])
 
-    async def next_page(self, page, i=1):
+    async def next_page(self, page):
         """执行翻页"""
         await self.page.waitForSelector(".pagination-mod__show-more-page-button___txdoB", timeout=0)
         await self.page.click(".pagination-mod__show-more-page-button___txdoB")  # 显示全部页码
@@ -75,11 +75,11 @@ class Spider():
             await page.waitForSelector(".pagination-item-" + str(i) + " a", timeout=0)
             print("正面爬取第" + str(i) + "页" + time_now())
             await page.click(".pagination-item-" + str(i) + " a")
-            # while True:
-            #     s = random.random()
-            #     if s > 0.3:
-            #         await asyncio.sleep(s * 30)
-            #         break
+            while True:
+                s = random.random()
+                if s > 0.3:
+                    await asyncio.sleep(s * 30)
+                    break
 
     async def parse(self, mainOrders):
         """解析爬取内容信息"""
@@ -130,17 +130,19 @@ class Spider():
                     for x in range(len(refund)):
                         item['refundStatus'] = refund[x]['text']
                         item['isRefund'] = "1"
-                if self.m.data_compare(goodsCode=item["goodsCode"],
-                                       tbName=item['tbName'],
-                                       fromStore=self.fromStore):
-                    page_temp = await self.browser.newPage()
-                    await self.login.page_evaluate(page_temp)
-                    await page_temp.goto(url)
-                    content = await page_temp.content()
-                    await asyncio.sleep(5)
-                    await page_temp.close()
-                    temp = re.search('<span class="value-inline">(\d+)</span>', content)
-                    print(temp.group(1))
+                # x = self.m.data_compare(goodsCode=item["goodsCode"], tbName=item['tbName'], fromStore=self.fromStore)
+                # print(x)
+                # if x is not None:
+                #     temp_dict = item.copy()
+                #     page_temp = await self.browser.newPage()
+                #     await self.login.page_evaluate(page_temp)
+                #     await page_temp.goto(url)
+                #     content = await page_temp.content()
+                #     await asyncio.sleep(10)
+                #     await page_temp.close()
+                #     temp_dict['link_id'] = re.search('<span class="value-inline">(\d+)</span>', content).group(1)
+                #     temp_dict['fromStore'] = self.fromStore
+                #     self.m.maintain(x, **temp_dict)
                 self.save_in_sql(item=item, tableName='tb_order_detail_spider')
             self.save_in_sql(item=order, tableName='tb_order_spider')
 
