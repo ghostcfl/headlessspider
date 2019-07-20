@@ -21,7 +21,7 @@ class MaintainPrice():
         res = self.sql_element.select_data('prices_tb', 0, 'price_tb', **kwargs_temp)
         if res:
             pass
-            if self.item['unitPrice'] != res[0][0]:
+            if self.kwargs['unitPrice'] != res[0][0]:
                 return "更新"
             else:
                 return None
@@ -38,8 +38,8 @@ class MaintainPrice():
             item2 = {'stockid': kwargs['goodsCode'],
                      'shop_id': self.shop_id(kwargs['fromStore']),
                      'link_id': kwargs['link_id']}
-            # self.sql_element.update_old_data("prices_tb", item1, item2)
-            print(self.sql_element.update_old_data_sql("prices_tb", item1, item2))
+            self.sql_element.update_old_data("prices_tb", item1, item2)
+            # print(self.sql_element.update_old_data_sql("prices_tb", item1, item2))
         elif operation == "创建":
             item = {'stockid': kwargs['goodsCode'],
                     'link_id': kwargs['link_id'],
@@ -52,8 +52,8 @@ class MaintainPrice():
                     'flag': 'create',
                     'description': kwargs['tbName'],
                     }
-            # self.sql_element.insert_new_data('prices_tb', **item)
-            print(self.sql_element.insert_new_data_sql('prices_tb', **item))
+            self.sql_element.insert_new_data('prices_tb', **item)
+            # print(self.sql_element.insert_new_data_sql('prices_tb', **item))
 
 
 if __name__ == '__main__':

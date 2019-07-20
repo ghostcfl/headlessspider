@@ -31,10 +31,14 @@ class Spider():
     browser = None
     m = MaintainPrice()
 
-    def __init__(self):
-        self.login = Login()
-        loop = asyncio.get_event_loop()
-        self.browser, self.page, self.fromStore = loop.run_until_complete(self.login.login())
+    def __init__(self, login, browser, page, fromStore):
+        # self.login = Login()
+        # loop = asyncio.get_event_loop()
+        # self.browser, self.page, self.fromStore = loop.run_until_complete(self.login.login())
+        self.login = login
+        self.browser = browser
+        self.page = page
+        self.fromStore = fromStore
 
     def connect_sql(self):
         self.con = pymysql.connect(**SQL_SETTINGS_SPIDER)
@@ -80,6 +84,7 @@ class Spider():
                 if s > 0.3:
                     await asyncio.sleep(s * 30)
                     break
+            # await asyncio.sleep(150)
 
     async def parse(self, mainOrders):
         """解析爬取内容信息"""
@@ -130,8 +135,8 @@ class Spider():
                     for x in range(len(refund)):
                         item['refundStatus'] = refund[x]['text']
                         item['isRefund'] = "1"
-                # x = self.m.data_compare(goodsCode=item["goodsCode"], tbName=item['tbName'], fromStore=self.fromStore)
-                # print(x)
+                # x = self.m.data_compare(fromStore=self.fromStore, **item)
+                # # print(x)
                 # if x is not None:
                 #     temp_dict = item.copy()
                 #     page_temp = await self.browser.newPage()
@@ -185,7 +190,9 @@ class Spider():
                             item2["orderNo"] + "," + item2["tbName"] + "退款订单入库成功,入库字段字段为" + "refundStatus" + "==>" +
                             item1[
                                 "refundStatus"])
-                order['payTime'] = " ".join(doc("span:contains('付款时间:') + span").text().split(" ")[0:2])
+                payTime = " ".join(doc("span:contains('付款时间:') + span").text().split(" ")[0:2])
+                if payTime:
+                    order['payTime'] = payTime
                 order['tradeNo'] = doc("span:contains('支付宝交易号:')+span").text().split(" ")[0]
                 receiverInfo = doc("span:contains('收货地址：') + span").text()
                 try:
@@ -357,8 +364,10 @@ class Spider():
 
 
 if __name__ == '__main__':
+    login = Login()
     loop = asyncio.get_event_loop()
-    spider = Spider()
+    browser, page, fromStore = loop.run_until_complete(login.login())
+    spider = Spider(login, browser, page, fromStore)
     while True:
         print(spider.fromStore)
         print("starting spider")
