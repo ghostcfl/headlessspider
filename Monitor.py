@@ -8,13 +8,14 @@ from sql import Sql
 
 class Monitor():
     sql_element = Sql(**SQL_SETTINGS_SPIDER)
+    total_list = []
+    title_list = ['15分钟未付款订单', '24小时末发货订单', '退货退款未完成订单']
 
     def orderMonitor(self):
         result = self.sql_element.select_data("tb_order_spider", 0,
                                               *['createTime', 'payTime', 'orderStatus', 'orderNo', 'fromStore'])
         pay_timeout_list = []
         delivery_timeout_list = []
-        x = y = 1
         for i in result:
             item = {}
             item['createTime'] = i[0]
@@ -26,22 +27,26 @@ class Monitor():
             if item['payTime']:
                 hours = (d1 - item['payTime']).days * 24 + (d1 - item['payTime']).seconds / 3600
                 if item['orderStatus'] == "买家已付款" and hours > 24:
-                    item['count'] = x
-                    x += 1
-                    pay_timeout_list.append(item)
+                    item['hours'] = hours
+                    delivery_timeout_list.append(item)
             else:
                 minutes = (d1 - item['createTime']).seconds / 60
                 if item['orderStatus'] == "等待买家付款" and minutes > 15:
-                    item['count'] = y
-                    y += 1
-                    delivery_timeout_list.append(item)
+                    item['minutes'] = round(minutes)
+                    pay_timeout_list.append(item)
+        refund_list = self.refund_monitor()
         print(pay_timeout_list)
         print(delivery_timeout_list)
-        return pay_timeout_list, delivery_timeout_list
+        self.total_list = [pay_timeout_list, delivery_timeout_list, refund_list]
 
     def split_store(self, item):
         if item['fromStore'] == 'YK':
-            pass
+            string = store_trans('YK') + "\n"
+            for i in range(3):
+                string += self.title_list[i] + ':\n'
+                for j in range(len(self.total_list[i])):
+                    pass
+            print(string)
         elif item['fromStore'] == 'KY':
             pass
         elif item['fromStore'] == 'SC':
@@ -105,4 +110,7 @@ class Monitor():
 if __name__ == '__main__':
     m = Monitor()
     # m.orderMonitor()
-    m.orderMonitor()
+    m.split_store({'fromStore': 'YK',
+                   'status': [{'createTime': datetime.datetime(2019, 7, 20, 10, 50, 40), 'payTime': None,
+                               'orderStatus': '等待买家付款', 'orderNo': '545440642016868264', 'minutes': 403}, 1, 2],
+                   })
