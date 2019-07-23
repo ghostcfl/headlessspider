@@ -26,17 +26,18 @@ class Login(object):
             print("扫码登陆")
             # email = input("输入接收登陆二维码的邮箱")
             # mail_pic(email.split(","))
-        await self.phone_verify()
-        await self.page.waitForSelector("#container", timeout=0)
-        content = await self.page.content()
-        account = re.search('nick: "(.*?)",', content).group(1)
-        # print(account)
-        if account == "arduino_sz:test":
-            print("开源电子登陆成功")
-            fromStore = "KY"
-        elif account == "玉佳电子科技有限公司:test":
-            print("玉佳企业店登陆成功")
-            fromStore = "YK"
+        # await self.phone_verify()
+        # await self.page.waitForSelector("#container", timeout=0)
+        # content = await self.page.content()
+        # account = re.search('nick: "(.*?)",', content).group(1)
+        # # print(account)
+        # if account == "arduino_sz:test":
+        #     print("开源电子登陆成功")
+        #     fromStore = "KY"
+        # elif account == "玉佳电子科技有限公司:test":
+        #     print("玉佳企业店登陆成功")
+        #     fromStore = "YK"
+        fromStore = await self.phone_verify()
         return self.browser, self.page, fromStore
 
     async def get_cookies(self):
@@ -60,7 +61,32 @@ class Login(object):
         #     '''() =>{ Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5,6], }); }''')
 
     async def phone_verify(self):
-        await self.page.goto("https://trade.taobao.com/trade/itemlist/list_sold_items.htm",timeout=0)
+        try:
+            await self.page.waitForSelector("#container", timeout=30000)
+        except TimeoutError:
+            await self.verify()
+            await self.page.goto("https://myseller.taobao.com/home.htm")
+        finally:
+            await self.page.waitForSelector("#container", timeout=30000)
+            content = await self.page.content()
+            account = re.search('nick: "(.*?)",', content).group(1)
+            # print(account)
+            if account == "arduino_sz:test":
+                print("开源电子登陆成功")
+                fromStore = "KY"
+            elif account == "玉佳电子科技有限公司:test":
+                print("玉佳企业店登陆成功")
+                fromStore = "YK"
+            try:
+                await self.page.goto("https://trade.taobao.com/trade/itemlist/list_sold_items.htm")
+                await self.page.waitForSelector(".pagination-mod__show-more-page-button___txdoB", timeout=30000)
+            except TimeoutError:
+                await self.verify()
+            finally:
+                await self.page.goto("https://trade.taobao.com/trade/itemlist/list_sold_items.htm")
+                return fromStore
+
+    async def verify(self):
         try:
             await self.page.waitForSelector("div.aq_overlay_mask", timeout=10000)
         except TimeoutError:
@@ -73,6 +99,7 @@ class Login(object):
             a = input("请输入6位数字验证码：")
             await frames[1].type(".J_SafeCode", a, {'delay': self.input_time_random() - 50})
             await frames[1].click("#J_FooterSubmitBtn")
+
 
     def input_time_random(self):
         return random.randint(100, 151)

@@ -49,7 +49,7 @@ class Spider():
 
     async def get_page(self):
         # 跳转至订单页面
-        await self.page.goto(self.url)  # 跳转到订单页面
+        # await self.page.goto(self.url)  # 跳转到订单页面
         await self.next_page(self.page)
 
     async def intercept_request(self, req):
