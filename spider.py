@@ -5,6 +5,7 @@ from login import Login
 from settings import SQL_SETTINGS_SPIDER
 from Format import time_now, status_format
 from smtp import mail
+from sql import Sql
 from maintain_price import MaintainPrice
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,8 @@ class Spider():
     page = None
     fromStore = None
     browser = None
-    m = MaintainPrice()
+
+    # m = MaintainPrice()
 
     def __init__(self, login, browser, page, fromStore):
         # self.login = Login()
@@ -133,8 +135,9 @@ class Spider():
                     pass
                 else:
                     for x in range(len(refund)):
-                        item['refundStatus'] = refund[x]['text']
-                        item['isRefund'] = "1"
+                        if refund[x]['style'] == 't12':
+                            item['refundStatus'] = refund[x]['text']
+                            item['isRefund'] = "1"
                 # x = self.m.data_compare(fromStore=self.fromStore, **item)
                 # # print(x)
                 # if x is not None:
