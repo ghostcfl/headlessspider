@@ -73,3 +73,19 @@ def store_trans(string):
         return "玉佳电子"
     elif string == "TB":
         return "赛宝电子"
+
+
+def concat(dictionary, string):
+    """
+    拼装字典
+    :param dictionary: 需要拼装的字典
+    :param string: 拼装时所使用的连接的字符
+    :return: key='value' string key='value' string key='value'...
+    """
+    for k, v in dictionary.items():
+        dictionary[k] = str(v)
+    list_key_value = []
+    for k, v in dictionary.items():
+        list_key_value.append(k + "=" + '\'' + v + '\'')
+    conditions = string.join(list_key_value)
+    return conditions

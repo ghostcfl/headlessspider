@@ -26,6 +26,7 @@ class Login(object):
             print("扫码登陆")
             # email = input("输入接收登陆二维码的邮箱")
             # mail_pic(email.split(","))
+        await self.phone_verify()
         await self.page.waitForSelector("#container", timeout=0)
         content = await self.page.content()
         account = re.search('nick: "(.*?)",', content).group(1)
@@ -36,7 +37,6 @@ class Login(object):
         elif account == "玉佳电子科技有限公司:test":
             print("玉佳企业店登陆成功")
             fromStore = "YK"
-        await self.phone_verify()
         return self.browser, self.page, fromStore
 
     async def get_cookies(self):
