@@ -17,18 +17,20 @@ class Sql():
         try:
             self.cursor.execute(sql, tuple(kwargs.values()))
         except Exception as e:
-            print(e)
+            return e
         else:
             self.con.commit()
+            return None
 
     def update_old_data(self, table_name, dict1, dict2):
         sql = self.update_old_data_sql(table_name, dict1, dict2)
         try:
             self.cursor.execute(sql)
         except Exception as e:
-            print(e)
+            return e
         else:
             self.con.commit()
+            return None
 
     def select_data(self, table_name, limit_num, *args, **kwargs):
         sql = self.select_data_sql(table_name, limit_num, *args, **kwargs)
@@ -41,9 +43,10 @@ class Sql():
         try:
             self.cursor.execute(sql)
         except Exception as e:
-            print(e)
+            return e
         else:
             self.con.commit()
+            return None
 
     def concat(self, dictionary, string):
         """
