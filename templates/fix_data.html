@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fix Data</title>
+</head>
+<body>
+<form action="http://localhost:5000/fix" method="POST">
+    <table border="1">
+        <th>orderNo</th>
+        <th>优惠卷</th>
+        <th>编辑</th>
+        <tr>
+            <td>{{ result[1] }}</td>
+            <td>{{ result[11] }}</td>
+            <td><input name="orderNO" type="hidden" value="{{result[1]}}" />
+                <input type="text" name="couponPrice"/>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <table border="1">
+        <th>goodsCode</th>
+        <th>itemNo</th>
+        <th>优惠价格</th>
+        <th>编辑</th>
+        <tr>
+            {% for i in item %}
+            <td>{{ i[3] }}</td>
+            <td>{{ i[2] }}</td>
+            <td>{{ i[9] }}</td>
+            <td>
+                <input type="hidden" name="goodsCode" value="{{i[3]}}"/>
+                <input type="hidden" name="itemNo" value="{{i[2]}}"/>
+                <input type="text" name="unitPrice" />
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+    <p><input type="submit" value="submit"/></p>
+</form>
+</body>
+</html>
