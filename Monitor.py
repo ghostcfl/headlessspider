@@ -1,13 +1,13 @@
 import datetime, pymysql
 import re
-from settings import SQL_SETTINGS_SPIDER, my_user
+from settings import SQL_SETTINGS, my_user
 from smtp import mail
 from Format import time_zone, time_stamp, store_trans
 from sql import Sql
 
 
 class Monitor():
-    sql_element = Sql(**SQL_SETTINGS_SPIDER)
+    sql_element = Sql(**SQL_SETTINGS)
     total_list = []
     title_list = ['15分钟未付款订单', '24小时末发货订单', '退货退款未完成订单']
 

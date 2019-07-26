@@ -1,4 +1,4 @@
-from settings import SQL_SETTINGS_SPIDER
+from settings import SQL_SETTINGS
 from smtp import mail
 from Format import store_trans
 from sql import Sql
@@ -6,7 +6,7 @@ from sql import Sql
 
 def Verify():
     l_orderNo = []
-    sql_element = Sql(**SQL_SETTINGS_SPIDER)
+    sql_element = Sql(**SQL_SETTINGS)
     args = ['orderNo', 'deliverFee', 'actualFee', 'couponPrice', 'fromStore']
     kwargs = {'isVerify': '0', 'isDetaildown': '1'}
     result = sql_element.select_data("tb_order_spider", 0, *args, **kwargs)

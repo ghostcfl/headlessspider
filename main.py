@@ -7,12 +7,13 @@ from spider_to_weberp import to_weberp
 
 async def loop_get_page(s):
     while True:
-        print("a")
+        # print("a")
         start_time = datetime.datetime.now()
         await s.get_page()
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+        await asyncio.sleep(300)
 
 
 async def loop_order_page(s):

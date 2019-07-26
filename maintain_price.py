@@ -1,10 +1,10 @@
-from settings import SQL_SETTINGS_ERP
+from settings import SQL_SETTINGS
 from Format import time_now
 from sql import Sql
 
 
 class MaintainPrice():
-    sql_element = Sql(**SQL_SETTINGS_ERP)
+    sql_element = Sql(**SQL_SETTINGS)
 
     def __init__(self):
         pass

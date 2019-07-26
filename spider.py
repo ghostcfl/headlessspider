@@ -1,7 +1,7 @@
 import asyncio, logging, random, datetime, re, json
 from pyquery.pyquery import PyQuery as pq
 from login import Login
-from settings import SQL_SETTINGS_SPIDER
+from settings import SQL_SETTINGS
 from Format import time_now, status_format
 from smtp import mail
 from sql import Sql
@@ -74,13 +74,13 @@ class Spider():
                 s = random.random()
                 if s > 0.3:
                     # await asyncio.sleep(s * 30)
-                    await asyncio.sleep(s * 20)
+                    await asyncio.sleep(s * 30)
                     break
             # await asyncio.sleep(150)
 
     async def parse(self, mainOrders):
         """解析爬取内容信息"""
-        sql_element = Sql(**SQL_SETTINGS_SPIDER)
+        sql_element = Sql(**SQL_SETTINGS)
         for i in range(len(mainOrders)):
             order = {}  # 用于存储订单详细信息
             order['orderNo'] = mainOrders[i]["id"]
@@ -159,7 +159,7 @@ class Spider():
 
     async def order_page(self):
         """爬取订单详情"""
-        sql_element = Sql(**SQL_SETTINGS_SPIDER)
+        sql_element = Sql(**SQL_SETTINGS)
         result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
                                          **{'isDetaildown': 0, 'fromStore': self.fromStore})
         # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
@@ -253,7 +253,7 @@ class Spider():
                 while True:
                     s = random.random()
                     if s > 0.3:
-                        await asyncio.sleep(s * 60)
+                        await asyncio.sleep(s * 40)
                         break
         else:
             await asyncio.sleep(1)

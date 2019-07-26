@@ -1,6 +1,6 @@
 import pandas as pd
 import pymysql
-from settings import SQL_SETTINGS_SPIDER
+from settings import SQL_SETTINGS
 from sqlalchemy import create_engine
 from Format import time_now
 from settings import ERP_SQL_ENGINE
@@ -16,7 +16,7 @@ def to_weberp():
     index: DataFrame的index列是否要插入，默认True
     :return:
     """
-    con_spider = pymysql.connect(**SQL_SETTINGS_SPIDER)
+    con_spider = pymysql.connect(**SQL_SETTINGS)
     sql1 = "SELECT * FROM tb_order_spider WHERE isVerify = '1'"
     sql2 = """SELECT p.* FROM tb_order_detail_spider AS p,tb_order_spider AS l
            WHERE p.`orderNo` = l.`orderNo` AND l.`isVerify` = '1' """
