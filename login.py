@@ -62,8 +62,9 @@ class Login(object):
 
     async def phone_verify(self):
         try:
-            await self.page.waitForSelector("#container", timeout=30000)
+            await self.page.waitForSelector("#container", timeout=120000)
         except TimeoutError:
+            print("超时末扫码或需要手机验证！")
             await self.verify()
             await self.page.goto("https://myseller.taobao.com/home.htm")
         finally:

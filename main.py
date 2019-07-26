@@ -1,23 +1,29 @@
-import asyncio
+import asyncio, datetime
 from login import Login
 from spider import Spider
-import Verify
-import spider_to_weberp
+from Verify import Verify
+from spider_to_weberp import to_weberp
 
 
-def main():
+def run():
     loop = asyncio.get_event_loop()
-    login = Login()
-    browser, page, fromStore = loop.run_until_complete(login.login())
-    spider = Spider(login, browser, page, fromStore)
+    l = Login()
+    b, p, f = loop.run_until_complete(l.login())
+    s = Spider(l, b, p, f)
     while True:
-        spider.connect_sql()
-        tasks = [spider.get_page(), spider.order_page()]
-        loop.run_until_complete(tasks)
-        spider.sql_close()
-        Verify.Verify()
-        spider_to_weberp.to_weberp()
+        print(f)
+        print("starting spider")
+        start_time = datetime.datetime.now()
+        # tasks = [s.get_page(), s.order_page()]
+        loop.run_until_complete(s.get_page())
+        loop.run_until_complete(s.order_page())
+        Verify()
+        to_weberp()
+        end_time = datetime.datetime.now()
+        spending_time = end_time - start_time
+        print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+        loop.run_until_complete(asyncio.sleep(900))
 
 
 if __name__ == '__main__':
-    main()
+    run()

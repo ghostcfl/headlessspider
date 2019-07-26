@@ -34,8 +34,8 @@ def to_weberp():
     # try:
     df3.to_sql("tb_order_spider", con_weberp, if_exists="append", index=False)
     df4.to_sql("tb_order_detail_spider", con_weberp, if_exists="append", index=False)
-    df3.to_csv("./tb_order_spider.csv")
-    df4.to_csv("./tb_order_detail_spider.csv")
+    df3.to_csv("./test/tb_order_spider.csv")
+    df4.to_csv("./test/tb_order_detail_spider.csv")
     # except Exception:
     #     pass
     order_list = df3['orderNo'].to_list()
