@@ -12,4 +12,5 @@ tb_order_spider.csv
 spider_1.py
 /json
 /test
+/test/json
 
