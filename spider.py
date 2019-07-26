@@ -1,11 +1,11 @@
-import asyncio, logging, random, pymysql, datetime, re, json
-import numpy as np
+import asyncio, logging, random, datetime, re, json
 from pyquery.pyquery import PyQuery as pq
 from login import Login
 from settings import SQL_SETTINGS_SPIDER
 from Format import time_now, status_format
 from smtp import mail
 from sql import Sql
+from Verify import Verify
 from maintain_price import MaintainPrice
 
 logger = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class Spider():
                 s = random.random()
                 if s > 0.3:
                     # await asyncio.sleep(s * 30)
-                    await asyncio.sleep(s * 10)
+                    await asyncio.sleep(s * 20)
                     break
             # await asyncio.sleep(150)
 
@@ -160,7 +160,7 @@ class Spider():
     async def order_page(self):
         """爬取订单详情"""
         sql_element = Sql(**SQL_SETTINGS_SPIDER)
-        result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
+        result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
                                          **{'isDetaildown': 0, 'fromStore': self.fromStore})
         # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
         #                                  **{'orderNO': '291590886852248985'})
@@ -177,6 +177,10 @@ class Spider():
                 b = a.replace('\\\\\\"', '')
                 data = b.replace('\\"', '"')
                 m = json.loads(data)
+                if m['mainOrder']['statusInfo']['text'] == '当前订单状态：商品已拍下，等待买家付款':
+                    order['isDetaildown'] = 0
+                else:
+                    order['isDetaildown'] = 1
                 for k, v in m['mainOrder']['payInfo'].items():
                     if k == 'promotions':
                         promotions = m['mainOrder']['payInfo']['promotions']
@@ -186,7 +190,6 @@ class Spider():
                 for k, v in m.items():
                     if k == 'buyMessage':
                         order['buyerComments'] = v
-                order['isDetaildown'] = 1
                 orderNo = m['mainOrder']['id']
                 order_info = m['mainOrder']['orderInfo']['lines'][1]['content']
                 for i in range(len(order_info)):
@@ -246,12 +249,14 @@ class Spider():
                 else:
                     logger.warning(update)
                 await page.close()
+                Verify()
                 while True:
                     s = random.random()
                     if s > 0.3:
                         await asyncio.sleep(s * 60)
                         break
         else:
+            await asyncio.sleep(1)
             logger.info("没有可以爬取的详情")
 
     def save_in_sql(self, sql_element, item, tableName):
@@ -316,10 +321,10 @@ if __name__ == '__main__':
         print(spider.fromStore)
         print("starting spider")
         start_time = datetime.datetime.now()
-        # tasks = [spider.get_page(), spider.order_page()]
-        # loop.run_until_complete(asyncio.wait(tasks))
+        tasks = [spider.get_page(), spider.order_page()]
+        loop.run_until_complete(asyncio.wait(tasks))
         # loop.run_until_complete(spider.get_page())
-        loop.run_until_complete(spider.order_page())
+        # loop.run_until_complete(spider.order_page())
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")

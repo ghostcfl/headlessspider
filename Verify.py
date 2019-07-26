@@ -36,6 +36,9 @@ def Verify():
             list_tmp.append(store_trans(fromStore))
             list_tmp.append(orderNo)
             l_orderNo.append("|".join(list_tmp))
+            dict1 = {'isVerify': '2'}
+            dict2 = {'orderNo': orderNo}
+            sql_element.update_old_data('tb_order_spider', dict1, dict2)
         else:
             dict1 = {'isVerify': '1'}
             dict2 = {'orderNo': orderNo}
