@@ -28,5 +28,10 @@ def fix():
     return "Success"
 
 
+@app.route('/test')
+def test():
+    return render_template('1.html')
+
+
 if __name__ == '__main__':
     app.run()
