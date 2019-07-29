@@ -163,7 +163,7 @@ class Spider():
         result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
                                          **{'isDetaildown': 0, 'fromStore': self.fromStore})
         # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
-        #                                  **{'orderNO': '291590886852248985'})
+        #                                  **{'orderNO': '552454338290320545'})
         if result:
             for url in result:
                 order = {}
@@ -229,7 +229,7 @@ class Spider():
                             for x in j['content']:
                                 for k, v in x.items():
                                     if k == 'value':
-                                        temp += float(re.findall("\d+\.\d+", v).pop())
+                                        temp += float(re.findall("-?\d+\.\d+", v).pop())
                     item['unitBenefits'] = temp
                     update = sql_element.update_old_data('tb_order_detail_spider', item,
                                                          {'orderNo': orderNo, 'itemNo': itemNo})
