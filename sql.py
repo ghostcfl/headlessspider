@@ -101,6 +101,11 @@ class Sql():
         sql = "delete from %s where %s" % (table_name, where_string)
         return sql
 
+    def select(self, sql):
+        self.cursor.execute(sql)
+        res = self.cursor.fetchall()
+        return res
+
 
 if __name__ == '__main__':
     SQL_SETTINGS['db'] = "weberp"

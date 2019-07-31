@@ -12,29 +12,29 @@
         <p>indeterminate</p>
         <ul>
             <li>
-                <input type="checkbox" id="checkall">
+                <input type="checkbox" id="checkall" class="checkall">
                 <label for="value1">全选/取消</label>
             </li>
             <li>
                 <ul id="checklist">
                     <li>
-                        <input type="checkbox" name="arr[]" value="1">
+                        <input type="checkbox" name="arr[]" value="1" class="check">
                         <label for="value1">value1</label>
                     </li>
                     <li>
-                        <input type="checkbox" name="arr[]" value="2">
+                        <input type="checkbox" name="arr[]" value="2" class="check">
                         <label for="value1">value2</label>
                     </li>
                     <li>
-                        <input type="checkbox" name="arr[]" value="3">
+                        <input type="checkbox" name="arr[]" value="3" class="check">
                         <label for="value1">value3</label>
                     </li>
                     <li>
-                        <input type="checkbox" name="arr[]" value="4">
+                        <input type="checkbox" name="arr[]" value="4" class="check">
                         <label for="value1">value4</label>
                     </li>
                     <li>
-                        <input type="checkbox" name="arr[]" value="5">
+                        <input type="checkbox" name="arr[]" value="5" class="check">
                         <label for="value1">value5</label>
                     </li>
                 </ul>
@@ -46,34 +46,14 @@
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.9.1/jquery.js"></script>
 <script type="text/javascript">
     $(function () {
-        /*全选按钮状态显示判断*/
-        $("#checklist").find("input[type='checkbox']").click(function () {
-            /*初始化选择为TURE*/
-            $("#checkall")[0].checked = true;
-            /*获取未选中的*/
-            var nocheckedList = new Array();
-            $("#checklist").find('input:not(:checked)').each(function () {
-                nocheckedList.push($(this).val());
-            });
-            /*状态显示*/
-            if (nocheckedList.length == $("#checklist").find('input').length) {
-                $("#checkall")[0].checked = false;
-                $("#checkall")[0].indeterminate = false;
-            } else if (nocheckedList.length) {
-                $("#checkall")[0].indeterminate = true;
-            } else {
-                $("#checkall")[0].indeterminate = false;
-            }
-        });
-        // 全选/取消
-        $("#checkall").click(function () {
+        $(".checkall").click(function () {
             // alert(this.checked);
             if ($(this).is(':checked')) {
-                $("#checklist").find('input').each(function () {
+                $(".check").each(function () {
                     $(this).prop("checked", true);
                 });
             } else {
-                $("#checklist").find('input').each(function () {
+                $(".check").each(function () {
                     $(this).removeAttr("checked", false);
                     $(this).prop("checked", false); // 根据官方的建议：具有 true 和 false 两个属性的属性，如 checked, selected 或者 disabled 使用prop()，其他的使用 attr()
                 });

@@ -9,6 +9,7 @@ def Verify():
     sql_element = Sql(**SQL_SETTINGS)
     args = ['orderNo', 'deliverFee', 'actualFee', 'couponPrice', 'fromStore']
     kwargs = {'isVerify': '0', 'isDetaildown': '1'}
+    # kwargs = {'isVerify': '2', 'isDetaildown': '1'}
     result = sql_element.select_data("tb_order_spider", 0, *args, **kwargs)
     for i in result:
         total = 0

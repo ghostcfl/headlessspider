@@ -160,10 +160,10 @@ class Spider():
     async def order_page(self):
         """爬取订单详情"""
         sql_element = Sql(**SQL_SETTINGS)
-        result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
-                                         **{'isDetaildown': 0, 'fromStore': self.fromStore})
-        # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
-        #                                  **{'orderNO': '552454338290320545'})
+        # result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
+        #                                  **{'isDetaildown': 0, 'fromStore': self.fromStore})
+        result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
+                                         **{'orderNO': '546094087285999499'})
         if result:
             for url in result:
                 order = {}
@@ -321,10 +321,10 @@ if __name__ == '__main__':
         print(spider.fromStore)
         print("starting spider")
         start_time = datetime.datetime.now()
-        tasks = [spider.get_page(), spider.order_page()]
-        loop.run_until_complete(asyncio.wait(tasks))
+        # tasks = [spider.get_page(), spider.order_page()]
+        # loop.run_until_complete(asyncio.wait(tasks))
         # loop.run_until_complete(spider.get_page())
-        # loop.run_until_complete(spider.order_page())
+        loop.run_until_complete(spider.order_page())
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
