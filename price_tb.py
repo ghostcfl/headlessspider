@@ -10,7 +10,9 @@ class PriceTaoBao():
     url = "https://item.publish.taobao.com/taobao/manager/" \
           "render.htm?pagination.current=2&pagination.pageSize" \
           "=20&tab=all&table.sort.upShelfDate_m=desc"
-    sql_element = Sql(**SQL_SETTINGS)
+    DB_TEST = SQL_SETTINGS.copy()
+    DB_TEST['db'] = 'test'
+    sql_element = Sql(**DB_TEST)
 
     def __init__(self, login, browser, page, fromStore):
         # self.login = Login()

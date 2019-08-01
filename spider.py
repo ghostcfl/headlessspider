@@ -81,6 +81,7 @@ class Spider():
     async def parse(self, mainOrders):
         """解析爬取内容信息"""
         sql_element = Sql(**SQL_SETTINGS)
+        m = MaintainPrice()
         for i in range(len(mainOrders)):
             order = {}  # 用于存储订单详细信息
             order['orderNo'] = mainOrders[i]["id"]
@@ -131,19 +132,18 @@ class Spider():
                         if refund[x]['style'] == 't12':
                             item['refundStatus'] = refund[x]['text']
                             item['isRefund'] = "1"
-                # x = self.m.data_compare(fromStore=self.fromStore, **item)
-                # # print(x)
-                # if x is not None:
-                #     temp_dict = item.copy()
-                #     page_temp = await self.browser.newPage()
-                #     await self.login.page_evaluate(page_temp)
-                #     await page_temp.goto(url)
-                #     content = await page_temp.content()
-                #     await asyncio.sleep(10)
-                #     await page_temp.close()
-                #     temp_dict['link_id'] = re.search('<span class="value-inline">(\d+)</span>', content).group(1)
-                #     temp_dict['fromStore'] = self.fromStore
-                #     self.m.maintain(x, **temp_dict)
+                temp_dict = item.copy()
+                temp_dict['fromStore'] = self.fromStore
+                link_id = m.get_link_id(**temp_dict)
+                if link_id:
+                    temp_dict['link_id'] = link_id
+                    x = m.data_compare(**temp_dict)
+                    # print(x)
+                    if x is not None:
+                        m.maintain(x, **temp_dict)
+                else:
+                    logger.warning("time_now() + sql_temp.concat(kwargs_temp, '|') + '没有这个条码！'")
+
                 self.save_in_sql(sql_element, item=item, tableName='tb_order_detail_spider')
             self.save_in_sql(sql_element, item=order, tableName='tb_order_spider')
 
@@ -264,23 +264,16 @@ class Spider():
             """判断是否orderdetail"""
             dict_select_condition = {'goodsCode': item['goodsCode'], 'orderNo': item['orderNo'],
                                      'itemNo': item['itemNo']}
-            dict_update_value = {'orderStatus': item['orderStatus'], 'isRefund': item['isRefund'],
-                                 'refundStatus': item['refundStatus']}
             result = sql_element.select_data(
-                tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
+                tableName, 0, *["*"], **dict_select_condition
+            )
             if result:
-                if result[0][0] != item['orderStatus'] or result[0][1] != item['isRefund'] or \
-                        result[0][2] != item['refundStatus']:
-                    update = sql_element.update_old_data(
-                        tableName, dict_update_value, dict_select_condition)
-                    if update is None:
-                        logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
-                                    "|订单详情状态更新成功|" +
-                                    sql_element.concat(dict_update_value, "|"))
-                    else:
-                        logger.warning(time_now() + " " + update)
+                update = sql_element.update_old_data(tableName, item, dict_select_condition)
+                if update is None:
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
+                                "|订单详情更新成功|")
                 else:
-                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
+                    logger.warning(time_now() + " " + update)
             else:
                 insert = sql_element.insert_new_data(tableName, **item)
                 if insert is None:
@@ -289,30 +282,75 @@ class Spider():
                     logger.warning(time_now() + " " + insert)
         else:
             dict_select_condition = {'orderNo': item['orderNo']}
-            # dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee']}
-            dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee'],
-                                 'sellerFlag': item['sellerFLag']}
             result = sql_element.select_data(
-                tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
+                tableName, 0, *["*"], **dict_select_condition
+            )
             if result:
-                if result[0][0] != item['orderStatus'] or result[0][1] != item['actualFee']\
-                        or result[0][2] != item['sellerFLag']:
-                    update = sql_element.update_old_data(
-                        tableName, dict_update_value, dict_select_condition)
-                    if update is None:
-                        logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
-                                    "|订单状态更新成功|" +
-                                    sql_element.concat(dict_update_value, "|"))
-                    else:
-                        logger.warning(time_now() + " " + update)
+                update = sql_element.update_old_data(tableName, item, dict_select_condition)
+                if update is None:
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
+                                "|订单详情更新成功|")
                 else:
-                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
+                    logger.warning(time_now() + " " + update)
             else:
                 insert = sql_element.insert_new_data(tableName, **item)
                 if insert is None:
-                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单写入成功")
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单详情写入成功")
                 else:
                     logger.warning(time_now() + " " + insert)
+            # if 'goodsCode' in item:
+            #     """判断是否orderdetail"""
+            # dict_select_condition = {'goodsCode': item['goodsCode'], 'orderNo': item['orderNo'],
+            #                          'itemNo': item['itemNo']}
+        #     dict_update_value = {'orderStatus': item['orderStatus'], 'isRefund': item['isRefund'],
+        #                          'refundStatus': item['refundStatus']}
+        #     result = sql_element.select_data(
+        #         tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
+        #     if result:
+        #         if result[0][0] != item['orderStatus'] or result[0][1] != item['isRefund'] or \
+        #                 result[0][2] != item['refundStatus']:
+        #             update = sql_element.update_old_data(
+        #                 tableName, dict_update_value, dict_select_condition)
+        #             if update is None:
+        #                 logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
+        #                             "|订单详情状态更新成功|" +
+        #                             sql_element.concat(dict_update_value, "|"))
+        #             else:
+        #                 logger.warning(time_now() + " " + update)
+        #         else:
+        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
+        #     else:
+        #         insert = sql_element.insert_new_data(tableName, **item)
+        #         if insert is None:
+        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单详情写入成功")
+        #         else:
+        #             logger.warning(time_now() + " " + insert)
+        # else:
+        #     dict_select_condition = {'orderNo': item['orderNo']}
+        #     # dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee']}
+        #     dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee'],
+        #                          'sellerFlag': item['sellerFLag']}
+        #     result = sql_element.select_data(
+        #         tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
+        #     if result:
+        #         if result[0][0] != item['orderStatus'] or result[0][1] != item['actualFee'] \
+        #                 or result[0][2] != item['sellerFLag']:
+        #             update = sql_element.update_old_data(
+        #                 tableName, dict_update_value, dict_select_condition)
+        #             if update is None:
+        #                 logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
+        #                             "|订单状态更新成功|" +
+        #                             sql_element.concat(dict_update_value, "|"))
+        #             else:
+        #                 logger.warning(time_now() + " " + update)
+        #         else:
+        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
+        #     else:
+        #         insert = sql_element.insert_new_data(tableName, **item)
+        #         if insert is None:
+        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单写入成功")
+        #         else:
+        #             logger.warning(time_now() + " " + insert)
 
 
 if __name__ == '__main__':
@@ -326,8 +364,8 @@ if __name__ == '__main__':
         start_time = datetime.datetime.now()
         # tasks = [spider.get_page(), spider.order_page()]
         # loop.run_until_complete(asyncio.wait(tasks))
-        # loop.run_until_complete(spider.get_page())
-        loop.run_until_complete(spider.order_page())
+        loop.run_until_complete(spider.get_page())
+        # loop.run_until_complete(spider.order_page())
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")

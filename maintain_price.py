@@ -5,6 +5,9 @@ from sql import Sql
 
 class MaintainPrice():
     sql_element = Sql(**SQL_SETTINGS)
+    db_test = SQL_SETTINGS.copy()
+    db_test['db'] = 'test'
+    sql_temp = Sql(**db_test)
 
     def __init__(self):
         pass
@@ -15,13 +18,13 @@ class MaintainPrice():
 
     def data_compare(self, **kwargs):
         kwargs_temp = {'stockid': kwargs['goodsCode'],
-                       'description': kwargs['tbName'],
+                       'link_id': kwargs['link_id'],
                        'shop_id': self.shop_id(fromStore=kwargs['fromStore']),
                        }
         res = self.sql_element.select_data('prices_tb', 0, 'price_tb', **kwargs_temp)
         if res:
             pass
-            if self.kwargs['unitPrice'] != res[0][0]:
+            if kwargs['unitPrice'] != res[0][0]:
                 return "更新"
             else:
                 return None
@@ -54,6 +57,16 @@ class MaintainPrice():
                     }
             self.sql_element.insert_new_data('prices_tb', **item)
             # print(self.sql_element.insert_new_data_sql('prices_tb', **item))
+
+    def get_link_id(self, **kwargs):
+        kwargs_temp = {'goodsCode': kwargs['goodsCode'],
+                       'fromStore': kwargs['fromStore'],
+                       }
+        result = self.sql_temp.select_data('prices_tb', 0, 'linkId', **kwargs_temp)
+        if result:
+            return result[0][0]
+        else:
+            return None
 
 
 if __name__ == '__main__':
