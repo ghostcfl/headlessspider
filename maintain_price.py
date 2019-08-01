@@ -68,6 +68,11 @@ class MaintainPrice():
         else:
             return None
 
+    def fix_data(self, **kwargs):
+        e = self.sql_temp.insert_new_data('fix_data', **kwargs)
+        if e is None:
+            print(e)
+
 
 if __name__ == '__main__':
     m = MaintainPrice()

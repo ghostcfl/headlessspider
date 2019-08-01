@@ -2,11 +2,12 @@ import asyncio, logging, random, datetime, re, json
 from pyquery.pyquery import PyQuery as pq
 from login import Login
 from settings import SQL_SETTINGS
-from Format import time_now, status_format
+from Format import time_now, concat
 from smtp import mail
 from sql import Sql
 from Verify import Verify
 from maintain_price import MaintainPrice
+from price_tb import PriceTaoBao
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
@@ -142,8 +143,16 @@ class Spider():
                     if x is not None:
                         m.maintain(x, **temp_dict)
                 else:
-                    logger.warning("time_now() + sql_temp.concat(kwargs_temp, '|') + '没有这个条码！'")
-
+                    logger.warning(
+                        time_now() + concat(
+                            {'goodsCode': temp_dict['goodsCode'], 'fromStore': temp_dict['fromStore']}, '|')
+                        + '没有这个条码！')
+                    m.fix_data(**{
+                        'goodsCode': temp_dict['goodsCode'],
+                        'tbName': temp_dict['tbName'],
+                        'fromStore': temp_dict['fromStore'],
+                        'flag': 1,
+                    })
                 self.save_in_sql(sql_element, item=item, tableName='tb_order_detail_spider')
             self.save_in_sql(sql_element, item=order, tableName='tb_order_spider')
 
