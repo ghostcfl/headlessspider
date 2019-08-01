@@ -289,11 +289,14 @@ class Spider():
                     logger.warning(time_now() + " " + insert)
         else:
             dict_select_condition = {'orderNo': item['orderNo']}
-            dict_update_value = {'orderStatus': item['orderStatus']}
+            # dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee']}
+            dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee'],
+                                 'sellerFlag': item['sellerFLag']}
             result = sql_element.select_data(
                 tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
             if result:
-                if result[0][0] != item['orderStatus']:
+                if result[0][0] != item['orderStatus'] or result[0][1] != item['actualFee']\
+                        or result[0][2] != item['sellerFLag']:
                     update = sql_element.update_old_data(
                         tableName, dict_update_value, dict_select_condition)
                     if update is None:
