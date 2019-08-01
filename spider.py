@@ -160,10 +160,10 @@ class Spider():
     async def order_page(self):
         """爬取订单详情"""
         sql_element = Sql(**SQL_SETTINGS)
-        # result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
-        #                                  **{'isDetaildown': 0, 'fromStore': self.fromStore})
-        result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
-                                         **{'orderNO': '546094087285999499'})
+        result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
+                                         **{'isDetaildown': 0, 'fromStore': self.fromStore})
+        # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
+        #                                  **{'orderNO': '546094087285999499'})
         if result:
             for url in result:
                 order = {}
@@ -234,20 +234,20 @@ class Spider():
                     update = sql_element.update_old_data('tb_order_detail_spider', item,
                                                          {'orderNo': orderNo, 'itemNo': itemNo})
                     if update is None:
-                        logger.info(sql_element.concat({'orderNo': orderNo, 'itemNo': itemNo}, "|") +
+                        logger.info(time_now() + " " + sql_element.concat({'orderNo': orderNo, 'itemNo': itemNo}, "|") +
                                     "|详细订单状态更新成功|" +
                                     sql_element.concat(item, "|"))
                     else:
-                        logger.warning(update)
+                        logger.warning(time_now() + " " + update)
                 #     print(item)
                 # print(order)
                 update = sql_element.update_old_data('tb_order_spider', order, {'orderNo': orderNo})
                 if update is None:
-                    logger.info(sql_element.concat({'orderNo': orderNo}, "|") +
+                    logger.info(time_now() + " " + sql_element.concat({'orderNo': orderNo}, "|") +
                                 "|订单状态更新成功|" +
                                 sql_element.concat(order, "|"))
                 else:
-                    logger.warning(update)
+                    logger.warning(time_now() + " " + update)
                 await page.close()
                 Verify()
                 while True:
@@ -257,7 +257,7 @@ class Spider():
                         break
         else:
             await asyncio.sleep(1)
-            logger.info("没有可以爬取的详情")
+            logger.info(time_now() + " " + "没有可以爬取的详情")
 
     def save_in_sql(self, sql_element, item, tableName):
         if 'goodsCode' in item:
@@ -274,19 +274,19 @@ class Spider():
                     update = sql_element.update_old_data(
                         tableName, dict_update_value, dict_select_condition)
                     if update is None:
-                        logger.info(sql_element.concat(dict_select_condition, "|") +
+                        logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
                                     "|订单详情状态更新成功|" +
                                     sql_element.concat(dict_update_value, "|"))
                     else:
-                        logger.warning(update)
+                        logger.warning(time_now() + " " + update)
                 else:
-                    logger.info(sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
             else:
                 insert = sql_element.insert_new_data(tableName, **item)
                 if insert is None:
-                    logger.info(sql_element.concat(dict_select_condition, "|") + "|新订单详情写入成功")
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单详情写入成功")
                 else:
-                    logger.warning(insert)
+                    logger.warning(time_now() + " " + insert)
         else:
             dict_select_condition = {'orderNo': item['orderNo']}
             dict_update_value = {'orderStatus': item['orderStatus']}
@@ -297,19 +297,19 @@ class Spider():
                     update = sql_element.update_old_data(
                         tableName, dict_update_value, dict_select_condition)
                     if update is None:
-                        logger.info(sql_element.concat(dict_select_condition, "|") +
+                        logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
                                     "|订单状态更新成功|" +
                                     sql_element.concat(dict_update_value, "|"))
                     else:
-                        logger.warning(update)
+                        logger.warning(time_now() + " " + update)
                 else:
-                    logger.info(sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
             else:
                 insert = sql_element.insert_new_data(tableName, **item)
                 if insert is None:
-                    logger.info(sql_element.concat(dict_select_condition, "|") + "|新订单写入成功")
+                    logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单写入成功")
                 else:
-                    logger.warning(insert)
+                    logger.warning(time_now() + " " + insert)
 
 
 if __name__ == '__main__':
