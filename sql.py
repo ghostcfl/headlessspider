@@ -17,6 +17,7 @@ class Sql():
         try:
             self.cursor.execute(sql, tuple(kwargs.values()))
         except Exception as e:
+            self.con.rollback()
             return e
         else:
             self.con.commit()
@@ -27,6 +28,7 @@ class Sql():
         try:
             self.cursor.execute(sql)
         except Exception as e:
+            self.con.rollback()
             return e
         else:
             self.con.commit()
@@ -43,6 +45,7 @@ class Sql():
         try:
             self.cursor.execute(sql)
         except Exception as e:
+            self.con.rollback()
             return e
         else:
             self.con.commit()

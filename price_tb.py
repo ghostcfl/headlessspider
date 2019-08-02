@@ -176,7 +176,7 @@ class PriceTaoBao():
         await self.page.goto(self.url)
         await self.page.waitForSelector("input[name='queryOuterId']", timeout=0)
         await self.page.waitForSelector("input[name='queryTitle']", timeout=0)
-        sql = "select tbName from fix_data where flag=1"
+        sql = "select tbName,goodsCode from fix_data where flag=1 and fromStore='%s'" % (self.fromStore)
         result = self.sql_element.select(sql)
         # await self.page.click(".filter-footer button:first-child")
         for i in result:
@@ -194,9 +194,11 @@ class PriceTaoBao():
             await self.page.keyboard.press("Home")
             await self.page.keyboard.down("ShiftLeft")
             await self.page.keyboard.press("Delete")
-            self.sql_element.delete_data('fix_data', tbName=i[0])
+            delete = self.sql_element.delete_data('fix_data', goodsCode=i[1],fromStore=self.fromStore)
+            if delete:
+                print(delete)
             await asyncio.sleep(1)
-            await self.page.click(".next-table-row td:nth-child(2) div.product-desc-hasImg span:nth-child(2) i")
+            # await self.page.click(".next-table-row td:nth-child(2) div.product-desc-hasImg span:nth-child(2) i")
             await asyncio.sleep(1)
             await page.keyboard.press('Escape')
             await asyncio.sleep(1)
@@ -208,5 +210,5 @@ if __name__ == '__main__':
     browser, page, fromStore = loop.run_until_complete(login.login())
     p = PriceTaoBao(login, browser, page, fromStore)
     # loop.run_until_complete(p.get_page())
-    loop.run_until_complete(p.get_attr())
-    # loop.run_until_complete(p.fix_data())
+    # loop.run_until_complete(p.get_attr())
+    loop.run_until_complete(p.fix_data())

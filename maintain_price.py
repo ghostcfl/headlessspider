@@ -4,13 +4,12 @@ from sql import Sql
 
 
 class MaintainPrice():
-    sql_element = Sql(**SQL_SETTINGS)
-    db_test = SQL_SETTINGS.copy()
-    db_test['db'] = 'test'
-    sql_temp = Sql(**db_test)
 
     def __init__(self):
-        pass
+        self.sql_element = Sql(**SQL_SETTINGS)
+        db_test = SQL_SETTINGS.copy()
+        db_test['db'] = 'test'
+        self.sql_temp = Sql(**db_test)
 
     def shop_id(self, fromStore):
         res = self.sql_element.select_data('salestypes', 0, 'shop_id', typeabbrev=fromStore)
@@ -75,7 +74,6 @@ class MaintainPrice():
 
 
 if __name__ == '__main__':
-    m = MaintainPrice()
     # a = m.data_compare(**{'goodsCode': "000001", 'tbName': 'abc', 'fromStore': "YK"})
-    print(m.shop_id(fromStore="YK"))
+    print(shop_id(fromStore="YK"))
     # print(a)
