@@ -169,7 +169,7 @@ class Spider():
     async def order_page(self):
         """爬取订单详情"""
         sql_element = Sql(**SQL_SETTINGS)
-        result = sql_element.select_data('tb_order_spider', 1, *['datailURL'],
+        result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
                                          **{'isDetaildown': 0, 'fromStore': self.fromStore})
         # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
         #                                  **{'orderNO': '546094087285999499'})
