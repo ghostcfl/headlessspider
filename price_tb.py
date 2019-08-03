@@ -80,7 +80,7 @@ class PriceTaoBao():
             await asyncio.sleep(3)
 
     async def get_attr(self):
-        await self.page.goto(self.url)
+        # await self.page.goto(self.url)
         await self.page.waitForSelector("input[name='queryOuterId']", timeout=0)
         sql = "SELECT linkId,url,goodsCode FROM prices_tb WHERE flag=0 and fromStore='%s' and goodsCode regexp '^MUT'" % (
             self.fromStore)
@@ -139,7 +139,8 @@ class PriceTaoBao():
                     else:
                         print("new data")
         else:
-            sys.exit(2)
+            pass
+            # sys.exit(2)
 
     async def parse_2(self, data):
         print(data)
@@ -147,7 +148,7 @@ class PriceTaoBao():
         result = self.sql_element.select_data(
             'prices_tb', 0,
             *['linkId', 'url'],
-            **{'outerId': outerId}
+            **{'outerId': outerId, 'fromStore': self.fromStore}
         )
         for i in data['skuOuterIdTable']['dataSource']:
             item = {}
@@ -166,9 +167,10 @@ class PriceTaoBao():
                 **{'linkId': item['linkId'], 'goodsCode': item['goodsCode']}
             )
             if res:
-                pass
+                print("Ex")
             else:
-                self.sql_element.insert_new_data('prices_tb', **item)
+                insert = self.sql_element.insert_new_data('prices_tb', **item)
+                print(insert)
                 print("new data")
 
     async def fix_data(self):
@@ -180,8 +182,8 @@ class PriceTaoBao():
         result = self.sql_element.select(sql)
         # await self.page.click(".filter-footer button:first-child")
         for i in result:
-            # await self.page.type("input[name='queryOuterId']", i[0])
-            await self.page.type("input[name='queryTitle']", i[0])
+            # await self.page.type("input[name='queryOuterId']", i[1])
+            await self.page.type("input[name='queryTitle']", i[0][0:])
             await self.page.setRequestInterception(True)
             self.page.on('request', self.intercept_request)
             self.page.on('response', self.intercept_response)
@@ -194,11 +196,27 @@ class PriceTaoBao():
             await self.page.keyboard.press("Home")
             await self.page.keyboard.down("ShiftLeft")
             await self.page.keyboard.press("Delete")
-            delete = self.sql_element.delete_data('fix_data', goodsCode=i[1],fromStore=self.fromStore)
+            delete = self.sql_element.delete_data('fix_data', goodsCode=i[1], fromStore=self.fromStore)
             if delete:
                 print(delete)
             await asyncio.sleep(1)
             # await self.page.click(".next-table-row td:nth-child(2) div.product-desc-hasImg span:nth-child(2) i")
+            await asyncio.sleep(1)
+            await page.keyboard.press('Escape')
+            await asyncio.sleep(1)
+
+    async def fix_data2(self):
+        # page = await self.browser.newPage()
+        await self.page.goto(self.url)
+        while True:
+            input("回车：")
+            # await self.page.type("input[name='queryOuterId']", i[1])
+            # await self.page.type("input[name='queryTitle']", i[0][0:])
+            await self.page.setRequestInterception(True)
+            self.page.on('request', self.intercept_request)
+            self.page.on('response', self.intercept_response)
+            await asyncio.sleep(1)
+            await self.page.click(".filter-footer button:first-child")
             await asyncio.sleep(1)
             await page.keyboard.press('Escape')
             await asyncio.sleep(1)
@@ -210,5 +228,6 @@ if __name__ == '__main__':
     browser, page, fromStore = loop.run_until_complete(login.login())
     p = PriceTaoBao(login, browser, page, fromStore)
     # loop.run_until_complete(p.get_page())
-    # loop.run_until_complete(p.get_attr())
     loop.run_until_complete(p.fix_data())
+    loop.run_until_complete(p.get_attr())
+    # loop.run_until_complete(p.fix_data2())
