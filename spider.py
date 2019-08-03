@@ -133,26 +133,26 @@ class Spider():
                         if refund[x]['style'] == 't12':
                             item['refundStatus'] = refund[x]['text']
                             item['isRefund'] = "1"
-                # temp_dict = item.copy()
-                # temp_dict['fromStore'] = self.fromStore
-                # link_id = m.get_link_id(**temp_dict)
-                # if link_id:
-                #     temp_dict['link_id'] = link_id
-                #     x = m.data_compare(**temp_dict)
-                #     # print(x)
-                #     if x is not None:
-                #         m.maintain(x, **temp_dict)
-                # else:
-                #     logger.warning(
-                #         time_now() + concat(
-                #             {'goodsCode': temp_dict['goodsCode'], 'fromStore': temp_dict['fromStore']}, '|')
-                #         + '没有这个条码！')
-                #     m.fix_data(**{
-                #         'goodsCode': temp_dict['goodsCode'],
-                #         'tbName': temp_dict['tbName'],
-                #         'fromStore': temp_dict['fromStore'],
-                #         'flag': 1,
-                #     })
+                temp_dict = item.copy()
+                temp_dict['fromStore'] = self.fromStore
+                link_id = m.get_link_id(**temp_dict)
+                if link_id:
+                    temp_dict['link_id'] = link_id
+                    x = m.data_compare(**temp_dict)
+                    # print(x)
+                    if x is not None:
+                        m.maintain(x, **temp_dict)
+                else:
+                    logger.warning(
+                        time_now() + concat(
+                            {'goodsCode': temp_dict['goodsCode'], 'fromStore': temp_dict['fromStore']}, '|')
+                        + '没有这个条码！')
+                    m.fix_data(**{
+                        'goodsCode': temp_dict['goodsCode'],
+                        'tbName': temp_dict['tbName'],
+                        'fromStore': temp_dict['fromStore'],
+                        'flag': 1,
+                    })
                 self.save_in_sql(sql_element, item=item, tableName='tb_order_detail_spider')
             self.save_in_sql(sql_element, item=order, tableName='tb_order_spider')
 
