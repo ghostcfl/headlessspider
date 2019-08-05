@@ -203,7 +203,10 @@ class Spider():
                 order_info = m['mainOrder']['orderInfo']['lines'][1]['content']
                 for i in range(len(order_info)):
                     if order_info[i]['value']['name'] == '支付宝交易号:':
-                        order['tradeNo'] = order_info[i]['value']['value']
+                        try:
+                            order['tradeNo'] = order_info[i]['value']['value']
+                        except KeyError:
+                            order['tradeNo'] = None
                     # elif order_info[i]['value']['name'] == '创建时间:':
                     #     order['createTime'] = order_info[i]['value']['value']
                     # elif order_info[i]['value']['name'] == '发货时间:':
@@ -373,8 +376,8 @@ if __name__ == '__main__':
         start_time = datetime.datetime.now()
         # tasks = [spider.get_page(), spider.order_page()]
         # loop.run_until_complete(asyncio.wait(tasks))
-        loop.run_until_complete(spider.get_page())
-        # loop.run_until_complete(spider.order_page())
+        # loop.run_until_complete(spider.get_page())
+        loop.run_until_complete(spider.order_page())
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
