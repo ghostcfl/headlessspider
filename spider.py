@@ -108,7 +108,7 @@ class Spider():
                 item['orderNo'] = mainOrders[i]["id"]
                 item['itemNo'] = j
                 item['goodsCode'] = items[j]['itemInfo']['extra'][0]['value']
-                item['tbName'] = items[j]['itemInfo']['title'].strip().replace("&plusmn;", "±")
+                item['tbName'] = items[j]['itemInfo']['title'].strip().replace("&plusmn;", "±").replace("&Phi;", "Φ")
                 item['unitPrice'] = items[j]['priceInfo']['realTotal']
                 item['sellNum'] = items[j]['quantity']
                 item['orderStatus'] = order['orderStatus']
