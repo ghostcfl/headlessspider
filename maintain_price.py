@@ -60,6 +60,7 @@ class MaintainPrice():
     def get_link_id(self, **kwargs):
         kwargs_temp = {'goodsCode': kwargs['goodsCode'],
                        'fromStore': kwargs['fromStore'],
+                       'tbName': kwargs['tbName'],
                        }
         result = self.sql_temp.select_data('prices_tb', 0, 'linkId', **kwargs_temp)
         if result:
@@ -75,5 +76,5 @@ class MaintainPrice():
 
 if __name__ == '__main__':
     # a = m.data_compare(**{'goodsCode': "000001", 'tbName': 'abc', 'fromStore': "YK"})
-    print(shop_id(fromStore="YK"))
+    pass
     # print(a)
