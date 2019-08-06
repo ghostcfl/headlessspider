@@ -36,6 +36,7 @@ class MaintainPrice():
                      'operator': '爬虫维护',
                      'last_time': time_now(),
                      'attribute': kwargs['goodsAttribute'],
+                     'description': kwargs['tbName'],
                      'flag': 'update'}
             item2 = {'stockid': kwargs['goodsCode'],
                      'shop_id': self.shop_id(kwargs['fromStore']),
