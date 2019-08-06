@@ -128,7 +128,10 @@ class PriceTaoBao():
                 print(item['goodsCode'])
                 result = self.sql_element.select_data(
                     'prices_tb', 0, "*",
-                    **{'linkId': item['linkId'], 'goodsCode': item['goodsCode'], 'fromStore': self.fromStore}
+                    **{'linkId': item['linkId'],
+                       'goodsCode': item['goodsCode'],
+                       'tbName': item['tbName'],
+                       'fromStore': self.fromStore}
                 )
                 if result:
                     print("Exist")
@@ -164,7 +167,10 @@ class PriceTaoBao():
             item['updateTime'] = time_now()
             res = self.sql_element.select_data(
                 'prices_tb', 0, "*",
-                **{'linkId': item['linkId'], 'goodsCode': item['goodsCode']}
+                **{'linkId': item['linkId'],
+                   'goodsCode': item['goodsCode'],
+                   'tbName': item['tbName'],
+                   }
             )
             if res:
                 print("Ex")
