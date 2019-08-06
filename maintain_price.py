@@ -31,30 +31,22 @@ class MaintainPrice():
             return "创建"
 
     def maintain(self, operation, **kwargs):
+        item = {'stockid': kwargs['goodsCode'],
+                'link_id': kwargs['link_id'],
+                'shop_id': self.shop_id(kwargs['fromStore']),
+                'price_tb': kwargs['unitPrice'],
+                'currabrev': 'CNY',
+                'operator': '爬虫维护',
+                'last_time': time_now(),
+                'attribute': kwargs['goodsAttribute'],
+                'flag': None,
+                'description': kwargs['tbName'],
+                }
         if operation == "更新":
-            item1 = {'price_tb': kwargs['unitPrice'],
-                     'operator': '爬虫维护',
-                     'last_time': time_now(),
-                     'attribute': kwargs['goodsAttribute'],
-                     'description': kwargs['tbName'],
-                     'flag': 'update'}
-            item2 = {'stockid': kwargs['goodsCode'],
-                     'shop_id': self.shop_id(kwargs['fromStore']),
-                     'link_id': kwargs['link_id']}
-            self.sql_element.update_old_data("prices_tb", item1, item2)
-            # print(self.sql_element.update_old_data_sql("prices_tb", item1, item2))
+            item['flag'] = 'update'
+            self.sql_element.insert_new_data('prices_tb', **item)
         elif operation == "创建":
-            item = {'stockid': kwargs['goodsCode'],
-                    'link_id': kwargs['link_id'],
-                    'shop_id': self.shop_id(kwargs['fromStore']),
-                    'price_tb': kwargs['unitPrice'],
-                    'currabrev': 'CNY',
-                    'operator': '爬虫维护',
-                    'last_time': time_now(),
-                    'attribute': kwargs['goodsAttribute'],
-                    'flag': 'create',
-                    'description': kwargs['tbName'],
-                    }
+            item['flag'] = 'create'
             self.sql_element.insert_new_data('prices_tb', **item)
             # print(self.sql_element.insert_new_data_sql('prices_tb', **item))
 
