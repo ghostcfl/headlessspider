@@ -1,5 +1,5 @@
 from settings import SQL_SETTINGS
-from Format import time_now, date_now_str
+from Format import time_now, date_now_str, time_zone
 from sql import Sql
 from smtp import mail_reports
 import pandas as pd
@@ -86,13 +86,15 @@ class MaintainPrice():
         self.sql_temp.insert_new_data('update_reports', **self.report_item)
 
     def report_mail(self):
+        d1, d2 = time_zone("18:00", "18:00")
+        d1.day-1
         res = self.sql_temp.select(
             "SELECT shop_id,flag,COUNT(flag) FROM update_reports GROUP BY Flag,shop_id")
         df = pd.read_sql("select * from update_reports", self.sql_temp.con)
         date = date_now_str()
         df.to_csv("./reports/reports" + date + ".csv")
         out_list = []
-        out_list.append("今日爬虫维护 开源店 价格：<br>")
+        out_list.append("今日爬虫维护 开源店 价格  ：<br>")
         for r in res:
             # print(r)
             if r[0] == '115443253':
@@ -119,7 +121,13 @@ class MaintainPrice():
                     string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
                     out_list.append(string)
         # print("".join(out_list))
-        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["szjavali@qq.com"])
+        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com", "szjavali@qq.com"])
+        # try:
+        #     self.sql_temp.cursor.execute("delete from update_reports")
+        # except Exception as e:
+        #     self.sql_temp.con.rollback()
+        # else:
+        #     self.sql_temp.con.commit()
 
 
 if __name__ == '__main__':

@@ -35,14 +35,17 @@ async def loop_order_page(s):
         # print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
 
 
-async def loop_reports():
-    while True:
-        d1, d2 = time_zone("17:59", "18:00")
-        if d1 < datetime.datetime.now() < d2:
-            MaintainPrice.report_mail()
-            await asyncio.sleep(60)
-        else:
-            await asyncio.sleep(30)
+async def loop_reports(f):
+    if f == 'KY':
+        while True:
+            d1, d2 = time_zone("17:59", "18:00")
+            if d1 < datetime.datetime.now() < d2:
+                MaintainPrice.report_mail()
+                await asyncio.sleep(60)
+            else:
+                await asyncio.sleep(30)
+    else:
+        return
 
 
 def run():
@@ -50,7 +53,7 @@ def run():
     l = Login()
     b, p, f = loop.run_until_complete(l.login())
     s = Spider(l, b, p, f)
-    tasks = [loop_get_page(s), loop_order_page(s), loop_reports()]
+    tasks = [loop_get_page(s), loop_order_page(s), loop_reports(f)]
     loop.run_until_complete(asyncio.wait(tasks))
 
 
