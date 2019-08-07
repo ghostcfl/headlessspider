@@ -2,6 +2,7 @@ import asyncio, datetime
 from login import Login
 from spider import Spider
 from Format import time_zone, time_now
+from maintain_price import MaintainPrice
 
 
 async def loop_get_page(s):
@@ -34,12 +35,22 @@ async def loop_order_page(s):
         # print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
 
 
+async def loop_reports():
+    while True:
+        d1, d2 = time_zone("17:59", "18:00")
+        if d1 < datetime.datetime.now() < d2:
+            MaintainPrice.report_mail()
+            await asyncio.sleep(60)
+        else:
+            await asyncio.sleep(30)
+
+
 def run():
     loop = asyncio.get_event_loop()
     l = Login()
     b, p, f = loop.run_until_complete(l.login())
     s = Spider(l, b, p, f)
-    tasks = [loop_get_page(s), loop_order_page(s)]
+    tasks = [loop_get_page(s), loop_order_page(s), loop_reports()]
     loop.run_until_complete(asyncio.wait(tasks))
 
 
