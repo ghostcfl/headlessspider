@@ -1,9 +1,12 @@
 from settings import SQL_SETTINGS
-from Format import time_now
+from Format import time_now, date_now_str
 from sql import Sql
+from smtp import mail_reports
+import pandas as pd
 
 
 class MaintainPrice():
+    report_item = {}
 
     def __init__(self):
         self.sql_element = Sql(**SQL_SETTINGS)
@@ -23,10 +26,12 @@ class MaintainPrice():
         res = self.sql_element.select_data('prices_tb', 0, 'price_tb', **kwargs_temp)
         if res:
             pass
-            if kwargs['unitPrice'] != res[0][0]:
+            if float(kwargs['unitPrice']) - float(res[0][0]) != 0:
+                self.report_item['price_before'] = res[0][0]
                 return "更新"
             else:
                 return None
+
         else:
             return "创建"
 
@@ -49,6 +54,9 @@ class MaintainPrice():
             item['flag'] = 'create'
             self.sql_element.insert_new_data('prices_tb', **item)
             # print(self.sql_element.insert_new_data_sql('prices_tb', **item))
+        else:
+            item['flag'] = 'lookup'
+        self.report_in(**item)
 
     def get_link_id(self, **kwargs):
         kwargs_temp = {'goodsCode': kwargs['goodsCode'],
@@ -63,11 +71,59 @@ class MaintainPrice():
 
     def fix_data(self, **kwargs):
         e = self.sql_temp.insert_new_data('fix_data', **kwargs)
-        if e is None:
+        if e:
             print(e)
+
+    def report_in(self, **kwargs):
+        self.report_item['stockid'] = kwargs['stockid']
+        self.report_item['link_id'] = kwargs['link_id']
+        self.report_item['shop_id'] = kwargs['shop_id']
+        self.report_item['price_tb'] = kwargs['price_tb']
+        self.report_item['last_time'] = kwargs['last_time']
+        self.report_item['attribute'] = kwargs['attribute']
+        self.report_item['flag'] = kwargs['flag']
+        self.report_item['description'] = kwargs['description']
+        self.sql_temp.insert_new_data('update_reports', **self.report_item)
+
+    def report_mail(self):
+        res = self.sql_temp.select(
+            "SELECT shop_id,flag,COUNT(flag) FROM update_reports GROUP BY Flag,shop_id")
+        df = pd.read_sql("select * from update_reports", self.sql_temp.con)
+        date = date_now_str()
+        df.to_csv("./reports/reports" + date + ".csv")
+        out_list = []
+        out_list.append("今日爬虫维护 开源店 价格：<br>")
+        for r in res:
+            # print(r)
+            if r[0] == '115443253':
+                if r[1] == 'create':
+                    string = '创建了 ' + str(r[2]) + ' 条数据。<br>'
+                    out_list.append(string)
+                elif r[1] == 'update':
+                    string = '更新了 ' + str(r[2]) + ' 条数据。<br>'
+                    out_list.append(string)
+                elif r[1] == 'lookup':
+                    string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
+                    out_list.append(string)
+        out_list.append("今日爬虫维护 玉佳企业店 价格：<br>")
+        for r in res:
+            # print(r)
+            if r[0] == '197444037':
+                if r[1] == 'create':
+                    string = '创建了 ' + str(r[2]) + ' 条数据。<br>'
+                    out_list.append(string)
+                elif r[1] == 'update':
+                    string = '更新了 ' + str(r[2]) + ' 条数据。<br>'
+                    out_list.append(string)
+                elif r[1] == 'lookup':
+                    string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
+                    out_list.append(string)
+        # print("".join(out_list))
+        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["szjavali@qq.com"])
 
 
 if __name__ == '__main__':
     # a = m.data_compare(**{'goodsCode': "000001", 'tbName': 'abc', 'fromStore': "YK"})
-    pass
+    m = MaintainPrice()
+    m.report_mail()
     # print(a)

@@ -66,5 +66,33 @@ def mail_pic(*args):
         return True
 
 
+def mail_reports(title, content, date, *args):
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = Header(my_sender)  # 发送者
+        msg['To'] = Header(",".join(args))
+        # msg['From'] = formataddr(["caifuliang", my_sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+        # msg['To'] = formataddr(["caifuliang", my_user])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+        msg['Subject'] = title  # 邮件的主题，也可以说是标题
+
+        mail_body = MIMEText(content, _subtype='html', _charset='utf-8')
+        msg.attach(mail_body)
+        # 构造附件1，传送当前目录下的 test.txt 文件
+        att1 = MIMEText(open('./reports/reports' + date + '.csv', 'rb').read(), 'base64', 'utf-8')
+        att1["Content-Type"] = 'application/octet-stream'
+        # 这里的filename可以任意写，写什么名字，邮件中显示什么名字
+        att1["Content-Disposition"] = 'attachment; filename="reports.csv"'
+        msg.attach(att1)
+
+        server = smtplib.SMTP_SSL("smtp.qq.com", 465)  # 发件人邮箱中的SMTP服务器，端口是25
+        server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
+        server.sendmail(my_sender, *args, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+        server.quit()  # 关闭连接
+        print("邮件发送成功")
+    except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
+        print(e)
+        print("邮件发送失败")
+
+
 if __name__ == '__main__':
-   mail_pic(["946930866@qq.com"])
+    mail_pic(["946930866@qq.com"])

@@ -140,8 +140,7 @@ class Spider():
                     temp_dict['link_id'] = link_id
                     x = m.data_compare(**temp_dict)
                     # print(x)
-                    if x is not None:
-                        m.maintain(x, **temp_dict)
+                    m.maintain(x, **temp_dict)
                 else:
                     logger.warning(
                         time_now() + concat(
