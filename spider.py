@@ -172,9 +172,9 @@ class Spider():
                                          **{'isDetaildown': 0, 'fromStore': self.fromStore})
 
         if result:
-            print("订单详情爬取")
+            # print("订单详情爬取")
             for url in result:
-                print(url)
+                # print(url)
                 order = {}
                 page = await self.browser.newPage()
                 await self.login.page_evaluate(page)
@@ -265,10 +265,11 @@ class Spider():
                 while True:
                     s = random.random()
                     if s > 0.3:
-                        print(s * 40)
+                        print("$" * 70)
                         await asyncio.sleep(s * 40)
                         break
         else:
+            print("@" * 70)
             logger.info(time_now() + " " + "没有可以爬取的详情")
 
     def save_in_sql(self, sql_element, item, tableName):
@@ -311,21 +312,33 @@ class Spider():
                 else:
                     logger.warning(time_now() + " " + insert)
 
+    async def deliver(self, orderNo, shipNo, fromStore):
+        if fromStore == self.fromStore:
+            url = 'https://wuliu.taobao.com/user/consign.htm?trade_id=' + orderNo
+            page = await self.browser.newPage()
+            await login.page_evaluate(page)
+            await page.goto(url)
+            await page.waitForSelector(".ks-combobox-placeholder", timeout=0)
+            await page.click("#offlineTab a")
+            await page.type(".ks-combobox-placeholder", shipNo)
+
 
 if __name__ == '__main__':
     login = Login()
     loop = asyncio.get_event_loop()
     browser, page, fromStore = loop.run_until_complete(login.login())
     spider = Spider(login, browser, page, fromStore)
-    while True:
-        print(spider.fromStore)
-        print("starting spider")
-        start_time = datetime.datetime.now()
-        # tasks = [spider.get_page(), spider.order_page()]
-        # loop.run_until_complete(asyncio.wait(tasks))
-        # loop.run_until_complete(spider.get_page())
-        loop.run_until_complete(spider.order_page())
-        end_time = datetime.datetime.now()
-        spending_time = end_time - start_time
-        print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
-        loop.run_until_complete(asyncio.sleep(900))
+    loop.run_until_complete(spider.deliver("570774880852899160", "12345678", "YK"))
+    # while True:
+    #     print(spider.fromStore)
+    #     print("starting spider")
+    #     start_time = datetime.datetime.now()
+    #     # tasks = [spider.get_page(), spider.order_page()]
+    #     # loop.run_until_complete(asyncio.wait(tasks))
+    #     # loop.run_until_complete(spider.get_page())
+    #     loop.run_until_complete(spider.order_page())
+    #     end_time = datetime.datetime.now()
+    #     spending_time = end_time - start_time
+    #     print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+    #     loop.run_until_complete(asyncio.sleep(900))
+    pass

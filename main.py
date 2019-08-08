@@ -3,6 +3,8 @@ from login import Login
 from spider import Spider
 from Format import time_zone, time_now
 from maintain_price import MaintainPrice
+from sql import Sql
+from settings import SQL_SETTINGS
 
 
 async def loop_get_page(s):
@@ -40,10 +42,23 @@ async def loop_reports(f):
                 MaintainPrice.report_mail()
                 await asyncio.sleep(900)
             else:
-                print("="*70)
+                print("=" * 70)
                 await asyncio.sleep(10)
     else:
         return
+
+
+async def loop_deliver(s):
+    # sql_element = Sql(**SQL_SETTINGS)
+    # while True:
+    #     print("#" * 70)
+    #     res = sql_element.select_data("tb_spider", 1, ["orderNO", "shipNo_erp", "fromStore"], isPrint=2)
+    #     if res:
+    #         await s.deliver(res[0][0], res[0][1], res[0][2])
+    #     else:
+    #         await asyncio.sleep(10)
+    #         continue
+    pass
 
 
 def run():
@@ -51,7 +66,7 @@ def run():
     l = Login()
     b, p, f = loop.run_until_complete(l.login())
     s = Spider(l, b, p, f)
-    tasks = [loop_get_page(s), loop_order_page(s), loop_reports(f)]
+    tasks = [loop_get_page(s), loop_order_page(s), loop_reports(f), loop_deliver(s)]
     loop.run_until_complete(asyncio.wait(tasks))
 
 

@@ -125,7 +125,7 @@ class MaintainPrice():
                     string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
                     out_list.append(string)
         # print("".join(out_list))
-        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com"])
+        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com",'szjavali@qq.com'])
         try:
             dt = (d1 - datetime.timedelta(days=3)).strftime("%Y-%m-%d %H:%M:%S")
             print(dt)
