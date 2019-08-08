@@ -228,7 +228,7 @@ class Spider():
                             #     order['shipUrl'] = "https" + v
                             elif k == 'address':
                                 rec_info = v
-                                order['receiverName'] = rec_info.split("，")[0]
+                                order['receiverName'] = rec_info.split("，")[0].replace(" ", "")
                                 order['receiverPhone'] = rec_info.split("，")[1]
                                 order['receiverAddress'] = "".join(rec_info.split("，")[2:])
                 sub_orders = m['mainOrder']['subOrders']
@@ -328,17 +328,17 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     browser, page, fromStore = loop.run_until_complete(login.login())
     spider = Spider(login, browser, page, fromStore)
-    loop.run_until_complete(spider.deliver("570774880852899160", "12345678", "YK"))
-    # while True:
-    #     print(spider.fromStore)
-    #     print("starting spider")
-    #     start_time = datetime.datetime.now()
-    #     # tasks = [spider.get_page(), spider.order_page()]
-    #     # loop.run_until_complete(asyncio.wait(tasks))
-    #     # loop.run_until_complete(spider.get_page())
-    #     loop.run_until_complete(spider.order_page())
-    #     end_time = datetime.datetime.now()
-    #     spending_time = end_time - start_time
-    #     print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
-    #     loop.run_until_complete(asyncio.sleep(900))
+    # loop.run_until_complete(spider.deliver("570774880852899160", "12345678", "YK"))
+    while True:
+        print(spider.fromStore)
+        print("starting spider")
+        start_time = datetime.datetime.now()
+        # tasks = [spider.get_page(), spider.order_page()]
+        # loop.run_until_complete(asyncio.wait(tasks))
+        # loop.run_until_complete(spider.get_page())
+        loop.run_until_complete(spider.order_page())
+        end_time = datetime.datetime.now()
+        spending_time = end_time - start_time
+        print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+        loop.run_until_complete(asyncio.sleep(900))
     pass
