@@ -1,0 +1,6 @@
+pyquery
+pymysql
+pyppeteer
+asyncio
+pandas
+numpy
