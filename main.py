@@ -17,7 +17,7 @@ async def loop_get_page(s):
         elif d_time3 < start_time < d_time4:
             t = 900
         elif d_time5 < start_time < d_time6:
-            t = 28000
+            t = 900
         await s.get_page()
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
@@ -28,22 +28,20 @@ async def loop_get_page(s):
 
 async def loop_order_page(s):
     while True:
-        # start_time = datetime.datetime.now()
         await s.order_page()
-        # end_time = datetime.datetime.now()
-        # spending_time = end_time - start_time
-        # print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
+        await asyncio.sleep(10)
 
 
 async def loop_reports(f):
     if f == 'KY':
         while True:
-            d1, d2 = time_zone("17:59", "18:00")
+            d1, d2 = time_zone("17:59", "18:05")
             if d1 < datetime.datetime.now() < d2:
                 MaintainPrice.report_mail()
-                await asyncio.sleep(60)
+                await asyncio.sleep(900)
             else:
-                await asyncio.sleep(30)
+                print("="*70)
+                await asyncio.sleep(10)
     else:
         return
 

@@ -170,10 +170,11 @@ class Spider():
         sql_element = Sql(**SQL_SETTINGS)
         result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
                                          **{'isDetaildown': 0, 'fromStore': self.fromStore})
-        # result = sql_element.select_data('tb_order_spider', 0, *['datailURL'],
-        #                                  **{'orderNO': '546094087285999499'})
+
         if result:
+            print("订单详情爬取")
             for url in result:
+                print(url)
                 order = {}
                 page = await self.browser.newPage()
                 await self.login.page_evaluate(page)
@@ -264,10 +265,10 @@ class Spider():
                 while True:
                     s = random.random()
                     if s > 0.3:
+                        print(s * 40)
                         await asyncio.sleep(s * 40)
                         break
         else:
-            await asyncio.sleep(1)
             logger.info(time_now() + " " + "没有可以爬取的详情")
 
     def save_in_sql(self, sql_element, item, tableName):
@@ -309,59 +310,6 @@ class Spider():
                     logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单详情写入成功")
                 else:
                     logger.warning(time_now() + " " + insert)
-            # if 'goodsCode' in item:
-            #     """判断是否orderdetail"""
-            # dict_select_condition = {'goodsCode': item['goodsCode'], 'orderNo': item['orderNo'],
-            #                          'itemNo': item['itemNo']}
-        #     dict_update_value = {'orderStatus': item['orderStatus'], 'isRefund': item['isRefund'],
-        #                          'refundStatus': item['refundStatus']}
-        #     result = sql_element.select_data(
-        #         tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
-        #     if result:
-        #         if result[0][0] != item['orderStatus'] or result[0][1] != item['isRefund'] or \
-        #                 result[0][2] != item['refundStatus']:
-        #             update = sql_element.update_old_data(
-        #                 tableName, dict_update_value, dict_select_condition)
-        #             if update is None:
-        #                 logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
-        #                             "|订单详情状态更新成功|" +
-        #                             sql_element.concat(dict_update_value, "|"))
-        #             else:
-        #                 logger.warning(time_now() + " " + update)
-        #         else:
-        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
-        #     else:
-        #         insert = sql_element.insert_new_data(tableName, **item)
-        #         if insert is None:
-        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单详情写入成功")
-        #         else:
-        #             logger.warning(time_now() + " " + insert)
-        # else:
-        #     dict_select_condition = {'orderNo': item['orderNo']}
-        #     # dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee']}
-        #     dict_update_value = {'orderStatus': item['orderStatus'], 'actualFee': item['actualFee'],
-        #                          'sellerFlag': item['sellerFLag']}
-        #     result = sql_element.select_data(
-        #         tableName, 0, *tuple(dict_update_value.keys()), **dict_select_condition)
-        #     if result:
-        #         if result[0][0] != item['orderStatus'] or result[0][1] != item['actualFee'] \
-        #                 or result[0][2] != item['sellerFLag']:
-        #             update = sql_element.update_old_data(
-        #                 tableName, dict_update_value, dict_select_condition)
-        #             if update is None:
-        #                 logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") +
-        #                             "|订单状态更新成功|" +
-        #                             sql_element.concat(dict_update_value, "|"))
-        #             else:
-        #                 logger.warning(time_now() + " " + update)
-        #         else:
-        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|订单没有更新")
-        #     else:
-        #         insert = sql_element.insert_new_data(tableName, **item)
-        #         if insert is None:
-        #             logger.info(time_now() + " " + sql_element.concat(dict_select_condition, "|") + "|新订单写入成功")
-        #         else:
-        #             logger.warning(time_now() + " " + insert)
 
 
 if __name__ == '__main__':

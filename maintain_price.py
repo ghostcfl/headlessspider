@@ -1,3 +1,4 @@
+import datetime
 from settings import SQL_SETTINGS
 from Format import time_now, date_now_str, time_zone
 from sql import Sql
@@ -87,10 +88,13 @@ class MaintainPrice():
 
     def report_mail(self):
         d1, d2 = time_zone("18:00", "18:00")
-        d1.day-1
-        res = self.sql_temp.select(
-            "SELECT shop_id,flag,COUNT(flag) FROM update_reports GROUP BY Flag,shop_id")
-        df = pd.read_sql("select * from update_reports", self.sql_temp.con)
+        d = (d1 - datetime.timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+        sql = "SELECT shop_id,flag,COUNT(flag) FROM update_reports " \
+              "WHERE last_time < '%s' AND last_time > '%s' " \
+              "GROUP BY Flag,shop_id" % (d1, d)
+        sql2 = "SELECT * FROM update_reports WHERE last_time < '%s' AND last_time > '%s' " % (d1, d)
+        res = self.sql_temp.select(sql)
+        df = pd.read_sql(sql2, self.sql_temp.con)
         date = date_now_str()
         df.to_csv("./reports/reports" + date + ".csv")
         out_list = []
@@ -121,13 +125,15 @@ class MaintainPrice():
                     string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
                     out_list.append(string)
         # print("".join(out_list))
-        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com", "szjavali@qq.com"])
-        # try:
-        #     self.sql_temp.cursor.execute("delete from update_reports")
-        # except Exception as e:
-        #     self.sql_temp.con.rollback()
-        # else:
-        #     self.sql_temp.con.commit()
+        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com"])
+        try:
+            dt = (d1 - datetime.timedelta(days=3)).strftime("%Y-%m-%d %H:%M:%S")
+            print(dt)
+            self.sql_temp.cursor.execute("delete from update_reports where last_time<%s", dt)
+        except Exception as e:
+            self.sql_temp.con.rollback()
+        else:
+            self.sql_temp.con.commit()
 
 
 if __name__ == '__main__':
