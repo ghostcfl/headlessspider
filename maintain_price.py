@@ -20,13 +20,12 @@ class MaintainPrice():
         return res[0][0]
 
     def data_compare(self, **kwargs):
-        kwargs_temp = {'stockid': kwargs['goodsCode'],
-                       'link_id': kwargs['link_id'],
-                       'shop_id': self.shop_id(fromStore=kwargs['fromStore']),
-                       }
-        res = self.sql_element.select_data('prices_tb', 0, 'price_tb', **kwargs_temp)
+        res = self.sql_element.select("""
+            SELECT price_tb FROM prices_tb 
+            WHERE stockid='%s' AND link_id='%s' AND shop_id='%s' 
+            ORDER BY last_time DESC LIMIT 1 
+            """ % (kwargs['goodsCode'], kwargs['link_id'], self.shop_id(fromStore=kwargs['fromStore'])))
         if res:
-            pass
             if float(kwargs['unitPrice']) - float(res[0][0]) != 0:
                 self.report_item['price_before'] = res[0][0]
                 return "更新"
@@ -76,20 +75,26 @@ class MaintainPrice():
             print(e)
 
     def report_in(self, **kwargs):
-        self.report_item['stockid'] = kwargs['stockid']
-        self.report_item['link_id'] = kwargs['link_id']
-        self.report_item['shop_id'] = kwargs['shop_id']
-        self.report_item['price_tb'] = kwargs['price_tb']
-        self.report_item['last_time'] = kwargs['last_time']
-        self.report_item['attribute'] = kwargs['attribute']
-        self.report_item['flag'] = kwargs['flag']
-        self.report_item['description'] = kwargs['description']
-        self.sql_temp.insert_new_data('update_reports', **self.report_item)
+        if kwargs['flag'] == 'lookup':
+            res = self.sql_temp.select_data('update_reports', 1, "lookup", link_id='count')
+            self.sql_temp.update_old_data("update_reports",
+                                          {'lookup': res[0][0] + 1, 'last_time': kwargs['last_time']},
+                                          {'link_id': 'count', 'shop_id': kwargs['shop_id']})
+        else:
+            self.report_item['stockid'] = kwargs['stockid']
+            self.report_item['link_id'] = kwargs['link_id']
+            self.report_item['shop_id'] = kwargs['shop_id']
+            self.report_item['price_tb'] = kwargs['price_tb']
+            self.report_item['last_time'] = kwargs['last_time']
+            self.report_item['attribute'] = kwargs['attribute']
+            self.report_item['flag'] = kwargs['flag']
+            self.report_item['description'] = kwargs['description']
+            self.sql_temp.insert_new_data('update_reports', **self.report_item)
 
     def report_mail(self):
         d1, d2 = time_zone("18:00", "18:00")
         d = (d1 - datetime.timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-        sql = "SELECT shop_id,flag,COUNT(flag) FROM update_reports " \
+        sql = "SELECT shop_id,flag,COUNT(flag),lookup FROM update_reports " \
               "WHERE last_time < '%s' AND last_time > '%s' " \
               "GROUP BY Flag,shop_id" % (d1, d)
         sql2 = "SELECT * FROM update_reports WHERE last_time < '%s' AND last_time > '%s' " % (d1, d)
@@ -109,7 +114,7 @@ class MaintainPrice():
                     string = '更新了 ' + str(r[2]) + ' 条数据。<br>'
                     out_list.append(string)
                 elif r[1] == 'lookup':
-                    string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
+                    string = '查看了 ' + str(r[3]) + ' 条数据。<br>'
                     out_list.append(string)
         out_list.append("今日爬虫维护 玉佳企业店 价格：<br>")
         for r in res:
@@ -122,14 +127,15 @@ class MaintainPrice():
                     string = '更新了 ' + str(r[2]) + ' 条数据。<br>'
                     out_list.append(string)
                 elif r[1] == 'lookup':
-                    string = '查看了 ' + str(r[2]) + ' 条数据。<br>'
+                    string = '查看了 ' + str(r[3]) + ' 条数据。<br>'
                     out_list.append(string)
         # print("".join(out_list))
-        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com",'szjavali@qq.com'])
+        mail_reports("爬虫更新erp价格报告", "".join(out_list), date, *["946930866@qq.com", 'szjavali@qq.com'])  #
         try:
             dt = (d1 - datetime.timedelta(days=3)).strftime("%Y-%m-%d %H:%M:%S")
             print(dt)
             self.sql_temp.cursor.execute("delete from update_reports where last_time<%s", dt)
+            self.sql_temp.cursor.execute("update update_reports set lookup=0 where link_id='count'")
         except Exception as e:
             self.sql_temp.con.rollback()
         else:

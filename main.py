@@ -37,10 +37,12 @@ async def loop_order_page(s):
 async def loop_reports(f):
     if f == 'KY':
         while True:
-            d1, d2 = time_zone("17:59", "18:05")
+            d1, d2 = time_zone("18:00", "18:05")
             if d1 < datetime.datetime.now() < d2:
+                print("*"*70)
                 MaintainPrice.report_mail()
-                await asyncio.sleep(900)
+                print("+" * 70)
+                await asyncio.sleep(300)
             else:
                 print("=" * 70)
                 await asyncio.sleep(10)

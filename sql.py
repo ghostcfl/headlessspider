@@ -7,6 +7,7 @@ class Sql():
         # print("数据库连接")
         self.con = pymysql.connect(**kwargs)
         self.cursor = self.con.cursor()
+        self.cursor_dict = self.con.cursor(cursor=pymysql.cursors.DictCursor)
 
     def __del__(self):
         # print("关闭数据库")
