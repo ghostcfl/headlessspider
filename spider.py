@@ -321,10 +321,13 @@ class Spider():
             await page.waitForSelector(".ks-combobox-placeholder", timeout=0)
             await page.click("#offlineTab a")
             await asyncio.sleep(1)
+            await page.click(".font-blue.J_ChangeVision")
+            await asyncio.sleep(1)
+            print("offlineMailNo" + shipCompany)
             await page.type("#offlineMailNo" + shipCompany, shipNo)
             # await page.click("#" + shipCompany)
-            sql_element = Sql()
-            sql_element.update_old_data("tb_order_spider", {"isPrint": 3}, {"orderNo": orderNo, "fromStore": fromStore})
+            # sql_element = Sql()
+            # sql_element.update_old_data("tb_order_spider", {"isPrint": 3}, {"orderNo": orderNo, "fromStore": fromStore})
 
 
 if __name__ == '__main__':
@@ -340,7 +343,8 @@ if __name__ == '__main__':
         # tasks = [spider.get_page(), spider.order_page()]
         # loop.run_until_complete(asyncio.wait(tasks))
         # loop.run_until_complete(spider.get_page())
-        loop.run_until_complete(spider.order_page())
+        # loop.run_until_complete(spider.order_page())
+        loop.run_until_complete(spider.deliver(" 551640557017888805", "12345678", fromStore, "SF"))
         end_time = datetime.datetime.now()
         spending_time = end_time - start_time
         print(str(round(spending_time.seconds / 60, 2)) + "分钟完成一轮爬取")
