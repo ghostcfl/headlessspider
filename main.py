@@ -40,7 +40,8 @@ async def loop_reports(f):
             d1, d2 = time_zone("18:00", "18:05")
             if d1 < datetime.datetime.now() < d2:
                 print("*"*70)
-                MaintainPrice.report_mail()
+                m = MaintainPrice()
+                m.report_mail()
                 print("+" * 70)
                 await asyncio.sleep(300)
             else:

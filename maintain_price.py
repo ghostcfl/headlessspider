@@ -92,7 +92,7 @@ class MaintainPrice():
             self.sql_temp.insert_new_data('update_reports', **self.report_item)
 
     def report_mail(self):
-        d1, d2 = time_zone("18:00", "18:00")
+        d1, d2 = time_zone("18:05", "18:05")
         d = (d1 - datetime.timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
         sql = "SELECT shop_id,flag,COUNT(flag),lookup FROM update_reports " \
               "WHERE last_time < '%s' AND last_time > '%s' " \
