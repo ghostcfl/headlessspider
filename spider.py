@@ -312,7 +312,7 @@ class Spider():
                 else:
                     logger.warning(time_now() + " " + insert)
 
-    async def deliver(self, orderNo, shipNo, fromStore):
+    async def deliver(self, orderNo, shipNo, fromStore, shipCompany):
         if fromStore == self.fromStore:
             url = 'https://wuliu.taobao.com/user/consign.htm?trade_id=' + orderNo
             page = await self.browser.newPage()
@@ -320,7 +320,11 @@ class Spider():
             await page.goto(url)
             await page.waitForSelector(".ks-combobox-placeholder", timeout=0)
             await page.click("#offlineTab a")
-            await page.type(".ks-combobox-placeholder", shipNo)
+            await asyncio.sleep(1)
+            await page.type("#offlineMailNo" + shipCompany, shipNo)
+            # await page.click("#" + shipCompany)
+            sql_element = Sql()
+            sql_element.update_old_data("tb_order_spider", {"isPrint": 3}, {"orderNo": orderNo, "fromStore": fromStore})
 
 
 if __name__ == '__main__':
