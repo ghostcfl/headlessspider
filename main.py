@@ -52,17 +52,17 @@ async def loop_reports(f):
 
 
 async def loop_deliver(s):
-    sql_element = Sql(**SQL_SETTINGS)
-    while True:
-        # print("#" * 70)
-        res = sql_element.select_data("tb_order_spider", 1, *["orderNO", "shipNo_erp", "fromStore", "shipCompany_erp"],
-                                      **{"isPrint": 2})
-        if res:
-            # print(res)
-            await s.deliver(res[0][0], res[0][1], res[0][2],res[0][3])
-        else:
-            # await asyncio.sleep(10)
-            continue
+    # sql_element = Sql(**SQL_SETTINGS)
+    # while True:
+    #     # print("#" * 70)
+    #     res = sql_element.select_data("tb_order_spider", 1, *["orderNO", "shipNo_erp", "fromStore", "shipCompany_erp"],
+    #                                   **{"isPrint": 2})
+    #     if res:
+    #         # print(res)
+    #         await s.deliver(res[0][0], res[0][1], res[0][2],res[0][3])
+    #     else:
+    #         # await asyncio.sleep(10)
+    #         continue
     pass
 
 
