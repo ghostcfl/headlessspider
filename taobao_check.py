@@ -30,8 +30,9 @@ def taobao_check():
                 if r['Total'] - actualFee[0]['actualFee'] != 0:
                     out_list.append("订单总价不一致，爬虫修正（%f ==> %f)" % (r['Total'], actualFee[0]['actualFee']))
                     # print("and".join(out_list))
-            else:
-                out_list.append("1")
+                else:
+                    out_list.append("1")
+            # print(out_list)
             sql_element.update_old_data("taobaoorders",
                                         {'Total': actualFee[0]['actualFee'],
                                          'spiderFlag': "and".join(out_list)},
@@ -49,8 +50,8 @@ def taobao_check():
                     price = (sd['unitPrice'] * sd['sellNum'] - sd['unitBenefits']) / sd['sellNum']
                     if price - rd['Price'] != 0:
                         out_str = "爬虫修正宝贝平均成交单价(%f ==> %f)" % (rd['Price'], price)
-                        print(round(price, 2))
-                        print(out_str)
+                        # print(round(price, 2))
+                        # print(out_str)
                         sql_element.update_old_data('taobaoordersdetail',
                                                     {'Price': round(price, 2), 'spiderFlag': out_str},
                                                     {'orderNo': r['orderNo'], 'ShopCode': rd['ShopCode']})
