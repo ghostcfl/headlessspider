@@ -59,11 +59,16 @@ class MaintainPrice():
         self.report_in(**item)
 
     def get_link_id(self, **kwargs):
-        kwargs_temp = {'goodsCode': kwargs['goodsCode'],
-                       'fromStore': kwargs['fromStore'],
-                       'tbName': kwargs['tbName'],
-                       }
-        result = self.sql_temp.select_data('prices_tb', 0, 'linkId', **kwargs_temp)
+        # kwargs_temp = {'goodsCode': kwargs['goodsCode'],
+        #                'fromStore': kwargs['fromStore'],
+        #                'tbName': kwargs['tbName'],
+        #                }
+        result = self.sql_temp.select("""select linkId from prices_tb
+        where goodsCode='%s' and fromStore='%s' and tbName='%s'
+        order by updateTime desc
+        limit 1
+        """ % (kwargs['goodsCode'], kwargs['fromStore'], kwargs['tbName']))
+        # result = self.sql_temp.select_data('prices_tb', 0, 'linkId', **kwargs_temp)
         if result:
             return result[0][0]
         else:
