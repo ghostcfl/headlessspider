@@ -1,7 +1,7 @@
 import asyncio, re, random
 from pyppeteer.launcher import launch
 from pyppeteer.errors import TimeoutError
-from settings import launch_setting, login_url, width, height
+from settings import launch_setting, login_url, width, height, pic_mail_recevier
 from smtp import mail_pic
 
 
@@ -25,7 +25,7 @@ class Login(object):
             await image_element.screenshot({'path': './qrcode.png'})
             print("扫码登陆")
             # email = input("输入接收登陆二维码的邮箱")
-            # mail_pic(email.split(","))
+            mail_pic(pic_mail_recevier.split(","))
         # await self.phone_verify()
         # await self.page.waitForSelector("#container", timeout=0)
         # content = await self.page.content()
@@ -100,7 +100,6 @@ class Login(object):
             a = input("请输入6位数字验证码：")
             await frames[1].type(".J_SafeCode", a, {'delay': self.input_time_random() - 50})
             await frames[1].click("#J_FooterSubmitBtn")
-
 
     def input_time_random(self):
         return random.randint(100, 151)

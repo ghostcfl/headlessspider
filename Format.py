@@ -19,10 +19,14 @@ def time_stamp():
     return str(int(time.time()))
 
 
-def time_zone(time1, time2):
-    d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time1, '%Y-%m-%d%H:%M')
-    d_time2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time2, '%Y-%m-%d%H:%M')
-    return d_time1, d_time2
+def time_zone(time1, time2=None):
+    if time2 is not None:
+        d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time1, '%Y-%m-%d%H:%M')
+        d_time2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time2, '%Y-%m-%d%H:%M')
+        return d_time1, d_time2
+    else:
+        d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time1, '%Y-%m-%d%H:%M')
+        return d_time1
 
 
 def status_format(string):

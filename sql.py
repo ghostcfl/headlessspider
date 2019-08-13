@@ -110,6 +110,11 @@ class Sql():
         res = self.cursor.fetchall()
         return res
 
+    def select_dict(self, sql):
+        self.cursor_dict.execute(sql)
+        res = self.cursor_dict.fetchall()
+        return res
+
 
 if __name__ == '__main__':
     SQL_SETTINGS['db'] = "weberp"
