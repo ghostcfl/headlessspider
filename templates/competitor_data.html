@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>竞争对手价格</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="col-md-3"></div>
+<div class="col-md-6">
+    <h1 style="text-align: center">竞争对手价格匹配</h1>
+    <form action="http://localhost:5000/competitor" method="post">
+        <label class="col-md-3">操作员：</label><input type="text" required name="operator" value="AI小爬"/><br>
+        <label class="col-md-3">淘宝名称：</label><a target="_blank" href="https://item.taobao.com/item.htm?id={{result[0].get('link_id')}}"><label>{{result[0].get("description")}}</label></a><br>
+        <label class="col-md-3">淘宝链接：</label><a target="_blank" href="https://item.taobao.com/item.htm?id={{result[0].get('link_id')}}"><label>{{result[0].get("link_id")}}</label></a><br>
+        <label class="col-md-3">店铺ID：</label><label>{{result[0].get("shop_id")}}</label><br>
+        <label class="col-md-3">操作时间：</label><label>{{result[0].get("last_time")}}</label><br>
+        <label class="col-md-3">转换因子：</label><label><input type="text" name="package_number_t" value="{{result[0].get('package_number')}}"/></label><br>
+        <label class="col-md-3">首件优惠：</label><label><input type="text" name="promotionprice" value="{{result[0].get('promotionprice')}}"/></label><br>
+        <label class="col-md-3">销量：</label><label><input type="text" name="sales" value="{{result[0].get('sales')}}"/></label><br>
+        <label class="col-md-3">评论：</label><label><input type="text" name="rates" value="{{result[0].get('rates')}}"/></label><br>
+        <input type="hidden" size="10" name="description" value="{{result[0].get('description')}}"/>
+        <input type="hidden" size="10" name="link_id" value="{{result[0].get('link_id')}}"/>
+        <input type="hidden" size="10" name="shop_id" value="{{result[0].get('shop_id')}}"/>
+        <input type="hidden" size="10" name="last_time" value="{{result[0].get('last_time')}}"/><br>
+        <input type="hidden" name="typeabbrev" value="{{result[0].get('typeabbrev')}}"/>
+        <input type="hidden" name="currabrev" value="{{result[0].get('currabrev')}}"/>
+        <input type="hidden" name="flag" value="{{result[0].get('flag')}}"/>
+        <input type="hidden" name="freight" value="{{result[0].get('freight')}}"/>
+        <input type="hidden" name="ratio" value="{{result[0].get('ratio')}}"/>
+        <input type="hidden" name="SpiderDate" value="{{result[0].get('SpiderDate')}}"/>
+        <input type="hidden" name="Checker" value="{{result[0].get('Checker')}}"/>
+        <input type="hidden" name="CheckDate" value="{{result[0].get('CheckDate')}}"/>
+        <input type="hidden" name="price_erp" value="{{result[0].get('price_erp')}}"/>
+        <table class="table table-bordered">
+            <thead>
+            <th class="col-md-2">物料编码</th>
+            <th class="col-md-4">属性</th>
+            <th class="col-md-4">价格</th>
+            <th class="col-md-2">转换因子</th>
+            </thead>
+            <tbody>
+            {% for x in result %}
+            <tr>
+                <td><input type="text" size="10" name="stockid[]"/></td>
+                <td><input type="hidden" size="10" name="attribute[]" value="{{x.get('attribute')}}"/>{{x.get("attribute")}}
+                </td>
+                <td><input type="hidden" size="10" name="price_tb[]" value="{{x.get('price_tb')}}"/>{{x.get("price_tb")}}
+                </td>
+                <td><input type="text" size="10" name="package_number[]" value="{{x.get('package_number')}}"/></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <input class="btn btn-lg btn-primary btn-block" type="submit" value="提交"/>
+    </form>
+</div>
+<div class="col-md-3"></div>
+</body>
+</html>

@@ -4,6 +4,9 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from settings import my_sender, my_pass
+from logger import get_logger
+
+logger = get_logger()
 
 my_sender = my_sender  # 发件人邮箱账号
 my_pass = my_pass  # 发件人邮箱密码
@@ -25,10 +28,10 @@ def mail(title, content, *args):
         server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
         server.sendmail(my_sender, *args, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
         server.quit()  # 关闭连接
-        print("邮件发送成功")
+        logger.info("邮件发送成功")
     except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
-        print(e)
-        print("邮件发送失败")
+        logger.info(e)
+        logger.info("邮件发送失败")
 
 
 def mail_pic(*args):
@@ -58,9 +61,9 @@ def mail_pic(*args):
         server.sendmail(my_sender, *args, msg.as_string())
         server.quit()
         # smtpObj.sendmail(my_sender, *args, message.as_string())
-        print("邮件发送成功")
+        logger.info("邮件发送成功")
     except smtplib.SMTPException as e:
-        print("Error: 无法发送邮件")
+        logger.info("Error: 无法发送邮件")
         return False
     else:
         return True
@@ -88,10 +91,10 @@ def mail_reports(title, content, date, *args):
         server.login(my_sender, my_pass)  # 括号中对应的是发件人邮箱账号、邮箱密码
         server.sendmail(my_sender, args, msg.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
         server.quit()  # 关闭连接
-        print("邮件发送成功")
+        logger.info("邮件发送成功")
     except Exception as e:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
-        print(e)
-        print("邮件发送失败")
+        logger.info(e)
+        logger.info("邮件发送失败")
 
 
 if __name__ == '__main__':

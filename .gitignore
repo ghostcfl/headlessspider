@@ -5,6 +5,7 @@ test.py
 /__pycache__
 test1.py
 log.txt
+log_price_tb.txt
 qrcode.png
 /screenshot
 tb_order_detail_spider.csv
@@ -15,3 +16,7 @@ spider_1.py
 /test/json
 /reports
 /venv
+headless-test-result.png
+/userdata
+/log
+*.log

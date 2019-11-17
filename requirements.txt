@@ -4,3 +4,8 @@ pyppeteer
 asyncio
 pandas
 numpy
+matplotlib
+retrying
+loguru
+flask
+requests

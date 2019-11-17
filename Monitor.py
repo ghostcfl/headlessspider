@@ -3,7 +3,7 @@ import re
 from settings import SQL_SETTINGS, my_user
 from smtp import mail
 from Format import time_zone, time_stamp, store_trans
-from sql import Sql
+from mysql import Sql
 
 
 class Monitor():
@@ -93,8 +93,8 @@ class Monitor():
         # mail("订单状态监测报告", d, my_user)
 
     def mail_control(self):
-        d_time1, d_time2 = time_zone("9:00", "9:30")
-        d_time3, d_time4 = time_zone("17:30", "18:00")
+        d = time_zone(["9:00", "9:30", "17:30", "18:00"])
+        d_time1, d_time2, d_time3, d_time4 = d[0], d[1], d[2], d[3]
         n_time = datetime.datetime.now()
         # 判断当前时间是否在范围时间内
         if d_time1 < n_time < d_time2:

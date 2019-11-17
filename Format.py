@@ -1,6 +1,8 @@
-import re
-import datetime
-import time
+import re, datetime, time, subprocess, requests
+from logger import get_logger
+from settings import LINUX
+
+logger = get_logger()
 
 
 def time_now_str():
@@ -19,23 +21,21 @@ def time_stamp():
     return str(int(time.time()))
 
 
-def time_zone(time1, time2=None):
-    if time2 is not None:
-        d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time1, '%Y-%m-%d%H:%M')
-        d_time2 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time2, '%Y-%m-%d%H:%M')
-        return d_time1, d_time2
-    else:
-        d_time1 = datetime.datetime.strptime(str(datetime.datetime.now().date()) + time1, '%Y-%m-%d%H:%M')
-        return d_time1
+def time_zone(args):
+    time_list = []
+    for t in args:
+        d_time = datetime.datetime.strptime(str(datetime.datetime.now().date()) + t, '%Y-%m-%d%H:%M')
+        time_list.append(d_time)
+    return time_list
 
 
 def status_format(string):
-    list = ["等待买家付款", "已付款", "交易关闭", "已发货", "交易成功"]
+    list = ["等待买家付款", "买家已付款", "交易关闭", "已发货", "交易成功"]
     for i in list:
         a = re.search(i, string)
         if a:
-            if a.group() == "等待买家付款":
-                temp = "未付款"
+            if a.group() == "已发货":
+                temp = "卖家已发货"
             else:
                 temp = a.group()
             return temp
@@ -57,15 +57,6 @@ def delivery_company_translate(company_name):
     else:
         ship_via = "1"
     return ship_via
-
-
-if __name__ == '__main__':
-    string = "当前订单状态：商品已拍下，等待买家付款"
-    # string = "当前订单状态：买家已付款，等待商家发货"
-    # string = "当前订单状态：交易关闭"
-    # string = "当前订单状态：商家已发货，等待买家确认"
-    # string = "当前订单状态：交易成功"
-    print(status_format(string))
 
 
 def store_trans(string):
@@ -97,3 +88,53 @@ def concat(dictionary, string):
         list_key_value.append(k + "=" + '\'' + v + '\'')
     conditions = string.join(list_key_value)
     return conditions
+
+
+def sleep(x=60):
+    assert type(x) is int and x > 0, "x的类型必需为整形并大于0"
+    time.sleep(1)
+    print(time_now() + " | ", end="", flush=True)
+    for i in range(x):
+        time.sleep(1)
+        print(">", end="", flush=True)
+    print("")
+    time.sleep(1)
+
+
+def ping_net_check(url):
+    if LINUX:
+        cmd = "ping -c 4 " + url
+        a = subprocess.run(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        res = a.returncode
+    else:
+        cmd = "ping " + url
+        res = subprocess.call(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return res
+
+
+def net_check(url=None):
+    if not url:
+        url = "www.baidu.com"
+    while True:
+        if not ping_net_check(url):
+            break
+        logger.info("当前网络异常，1分钟后尝试重连")
+        sleep(60)
+    return
+
+
+def value_time_control():
+    pass
+
+if __name__ == '__main__':
+    while 1:
+        t = time_zone(["08:00", "18:00", "23:59"])
+        logger.info(t)
+        a = datetime.datetime.now()
+        if a < t[0]:
+            logger.info("a")
+        elif t[0] < a < t[1]:
+            logger.info("b")
+        else:
+            logger.info("c")
+        sleep(5)

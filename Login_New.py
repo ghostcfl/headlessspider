@@ -40,9 +40,11 @@ def get_store_info(i):
 
 
 async def login(page, username, password, fromStore):
+    await page.setUserAgent(
+        "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3824.0 Safari/537.36")
     await page.setViewport({'width': width, 'height': height})
-    await page.goto(login_url)  # 访问登录页面
     await page_evaluate(page)  # 执行JS修改浏览器携带属性
+    await page.goto(login_url)  # 访问登录页面
     try:
         await page.waitForSelector('.forget-pwd.J_Quick2Static', timeout=3000)
         await page.click('.forget-pwd.J_Quick2Static')
@@ -63,7 +65,7 @@ async def login(page, username, password, fromStore):
             print("刷新")
             # 用于滑动失败刷新
             flag, page = await mouse_slide(page=page)
-            # await page.screenshot({'path': './headless-test-result.png'})
+            await page.screenshot({'path': './headless-test-result.png'})
             fresh = ''
             try:
                 fresh = await page.Jeval('.errloading', 'node => node.textContent')
@@ -107,8 +109,16 @@ async def page_evaluate(page):
     """
     await page.evaluate('''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => undefined } }) }''')
     await page.evaluate('''() =>{ window.navigator.chrome = { runtime: {},  }; }''')
+    await page.evaluate('''() => {
+    const originalQuery = window.navigator.permissions.query;
+    return window.navigator.permissions.query = (parameters) => (
+    parameters.name === 'notifications' ?
+      Promise.resolve({ state: Notification.permission }) :
+      originalQuery(parameters)
+    );
+    }''')
     await page.evaluate(
-        '''() =>{ Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] }); }''')
+            '''() =>{ Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] }); }''')
     await page.evaluate(
         '''() =>{ Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5,6], }); }''')
 
